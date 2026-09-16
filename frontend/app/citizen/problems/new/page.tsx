@@ -25,8 +25,12 @@ function Content() {
   const router = useRouter();
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
+  const [coordinates, setCoordinates] = React.useState<[number, number] | undefined>();
+  const [locationMessage, setLocationMessage] = React.useState("");
+  const [locating, setLocating] = React.useState(false);
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<Form>({
@@ -45,7 +49,12 @@ function Content() {
         title: v.title,
         description: v.description,
         category: v.category,
-        location: { city: v.city, state: v.state, country: v.country },
+        location: {
+          city: v.city,
+          state: v.state,
+          country: v.country,
+          ...(coordinates ? { type: "Point" as const, coordinates } : {}),
+        },
         priority: v.priority,
         ...(v.evidenceDescription || v.evidenceReference
           ? {
@@ -65,6 +74,44 @@ function Content() {
           : "Unable to submit this problem.",
       );
     }
+  }
+  function useCurrentLocation() {
+    if (!navigator.geolocation) {
+      setLocationMessage("This browser does not support device location.");
+      return;
+    }
+    setLocating(true);
+    setLocationMessage("Requesting your device location…");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const nextCoordinates: [number, number] = [coords.longitude, coords.latitude];
+        setCoordinates(nextCoordinates);
+        setLocationMessage("Location captured. Finding your city, state, and country…");
+        void fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=${coords.latitude}&lon=${coords.longitude}`,
+          { headers: { Accept: "application/json" } },
+        )
+          .then(async (response) => {
+            if (!response.ok) throw new Error("Geocoding failed");
+            return (await response.json()) as { address?: { city?: string; town?: string; village?: string; municipality?: string; state?: string; country?: string } };
+          })
+          .then((result) => {
+            const address = result.address;
+            const city = address?.city ?? address?.town ?? address?.village ?? address?.municipality;
+            if (city) setValue("city", city, { shouldValidate: true });
+            if (address?.state) setValue("state", address.state, { shouldValidate: true });
+            if (address?.country) setValue("country", address.country, { shouldValidate: true });
+            setLocationMessage(city && address?.state && address?.country ? "Location filled from your device. Please review it before submitting." : "Location captured. Please complete any missing location fields.");
+          })
+          .catch(() => setLocationMessage("Location captured, but the address could not be resolved. Please enter the city, state, and country manually."))
+          .finally(() => setLocating(false));
+      },
+      () => {
+        setLocationMessage("Location permission was unavailable. Enter the location manually.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 },
+    );
   }
   return (
     <main className="mx-auto max-w-5xl px-5 py-16">
@@ -123,6 +170,34 @@ function Content() {
           register={register}
           error={errors.country?.message}
         />
+        <div className="md:col-span-2 border border-white/40 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="form-label">Device location</p>
+              <p className="mt-2 text-sm text-white/50">
+                Use permission-based GPS to attach coordinates to this
+                submission.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={useCurrentLocation}
+              disabled={locating}
+            >
+              {locating
+                ? "Locating…"
+                : coordinates
+                  ? "Refresh location"
+                  : "Use current location"}
+            </button>
+          </div>
+          {locationMessage && (
+            <p className="mt-3 text-xs text-white/60" role="status">
+              {locationMessage}
+            </p>
+          )}
+        </div>
         <Select
           label="Category"
           name="category"
