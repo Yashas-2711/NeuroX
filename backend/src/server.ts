@@ -1,27 +1,24 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
+import app from "./app";
+import { connectDatabase } from "./config/database";
+import { env, validateEnvironment } from "./config/env";
 
-dotenv.config();
+async function startServer() {
+  validateEnvironment({ requireDatabase: env.nodeEnv !== "test" });
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+  if (env.nodeEnv !== "test") {
+    await connectDatabase();
+  }
 
-app.use(cors());
-app.use(helmet());
-app.use(morgan('dev'));
-app.use(express.json());
-
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'NeuroX Backend API' });
-});
-
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(env.port, () => {
+    console.log(`NeuroX backend listening on port ${env.port}`);
   });
 }
 
-export default app;
+if (require.main === module) {
+  startServer().catch((error: unknown) => {
+    console.error("Unable to start NeuroX backend:", error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}
+
+export { startServer };

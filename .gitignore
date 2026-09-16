@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 /.pnpm-store
-
+UI.md
 # Production & Build Outputs
 .next/
 out/
@@ -50,7 +50,6 @@ uploads/*
 !uploads/.gitkeep
 
 # ML Models & Heavy Binaries
-models/
 ai/models/
 ai/.cache/
 *.pt
