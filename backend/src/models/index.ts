@@ -64,14 +64,16 @@ const LocationSchema = new Schema(
     state: { type: String, trim: true },
     country: { type: String, trim: true },
     type: { type: String, enum: ["Point"] },
-    coordinates: { type: [Number] },
+    coordinates: { type: [Number], default: undefined },
   },
   { _id: false },
 );
 
 const EvidenceSchema = new Schema(
   {
-    url: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, maxlength: 2000 },
+    reference: { type: String, trim: true, maxlength: 500 },
+    url: { type: String, trim: true },
     type: { type: String, trim: true },
     caption: { type: String, trim: true, maxlength: 240 },
   },
@@ -98,7 +100,6 @@ const ProblemSchema = new Schema(
 );
 
 ProblemSchema.index({ createdAt: -1 });
-ProblemSchema.index({ location: "2dsphere" });
 export const Problem = models.Problem ?? model("Problem", ProblemSchema);
 
 const ContactSchema = new Schema(

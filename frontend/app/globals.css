@@ -15,8 +15,8 @@
   --color-m-blue-light: #0066b1;
   --color-m-red: #e22718;
   --color-success: #0fa336;
-  --font-sans: var(--font-geist-sans), Arial, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, monospace;
 }
 
 :root {
@@ -63,5 +63,6 @@
   .auth-input { @apply h-12 w-full border border-hairline bg-surface-soft px-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground; }
   .password-toggle { @apply absolute right-0 top-0 flex h-12 w-12 items-center justify-center text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-m-blue-dark; }
   .auth-error { @apply border border-m-red/60 bg-m-red/10 px-4 py-3 text-sm leading-6 text-foreground; }
+  .form-label { @apply text-[11px] font-medium uppercase tracking-[0.16em] text-foreground/70; }
   .button-primary:disabled { @apply cursor-not-allowed opacity-60; }
 }

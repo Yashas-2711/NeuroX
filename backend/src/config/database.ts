@@ -16,6 +16,15 @@ export async function connectDatabase(): Promise<void> {
   });
 
   await mongoose.connect(env.mongodbUri);
+
+  // Step 6 stores structured city/state/country values. The earlier schema
+  // created a 2dsphere index that is incompatible with that shape; GPS/maps
+  // are intentionally deferred to a later workflow step.
+  try {
+    await mongoose.connection.db?.collection("problems").dropIndex("location_2dsphere");
+  } catch (error) {
+    if ((error as { code?: number }).code !== 27) throw error;
+  }
 }
 
 export async function disconnectDatabase(): Promise<void> {

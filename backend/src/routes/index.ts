@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import healthRouter from "./health.routes";
 import authRouter from "./auth.routes";
+import problemRouter from "./problem.routes";
 
 const apiRouter = Router();
 
@@ -15,5 +16,6 @@ apiRouter.get("/", (_request, response) => {
 
 apiRouter.use(healthRouter);
 apiRouter.use("/auth", authRouter);
+apiRouter.use("/problems", problemRouter);
 
 export default apiRouter;
