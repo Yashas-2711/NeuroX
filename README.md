@@ -1,7 +1,11 @@
 # NeuroX — Societal Innovation Collaboration Platform
 
-**Problem Statement ID:** 26043  
+**Problem Statement ID:** 26043
 **Platform Type:** Responsive Web Platform for Crowdsourcing & Societal Innovation  
+
+## Step 1 Foundation Status
+
+Repository structure, dependency manifests, environment templates, and isolated runtime environments are being verified as the Step 1 foundation. Authentication, business APIs, database models, AI endpoints, and dashboards are outside the scope of this step.
 
 ---
 

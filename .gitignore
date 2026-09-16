@@ -11,7 +11,8 @@ coverage/
 
 # Environment Variables & Secrets
 .env
-.env.*
+.env.local
+.env.*.local
 !.env.example
 
 # Logs
@@ -26,6 +27,7 @@ pnpm-debug.log*
 venv/
 ENV/
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
@@ -49,6 +51,8 @@ uploads/*
 
 # ML Models & Heavy Binaries
 models/
+ai/models/
+ai/.cache/
 *.pt
 *.pth
 *.bin
