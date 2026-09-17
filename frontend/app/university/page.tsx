@@ -1,6 +1,9 @@
-import { UnderDevelopment } from "@/components/shared/under-development";
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { getUniversityMatches, getUniversityProfile } from "@/services/university.service";
+import type { Match, UniversityProfile } from "@/types/university";
 
-export default function UniversityPage() {
-  return <ProtectedRoute allowedRole="UNIVERSITY"><UnderDevelopment area="UNIVERSITY SPACE" /></ProtectedRoute>;
-}
+function Content(){const [matches,setMatches]=useState<Match[]>([]);const [profile,setProfile]=useState<UniversityProfile|null>(null);const [loading,setLoading]=useState(true);const [error,setError]=useState("");useEffect(()=>{Promise.all([getUniversityProfile(),getUniversityMatches()]).then(([p,m])=>{setProfile(p);setMatches(m)}).catch(()=>setError("Complete your profile to load opportunity matches.")).finally(()=>setLoading(false))},[]);return <main className="mx-auto max-w-6xl px-5 py-16"><p className="eyebrow">NeuroX / University workspace</p><h1 className="display-md mt-3">Opportunity intelligence</h1><p className="body-copy mt-5 max-w-2xl">Discover validated societal problems that align with your institution’s research capability.</p><div className="mt-10 flex flex-wrap gap-3"><Link href="/university/problems" className="button-primary">Discover problems</Link><Link href="/university/profile" className="button-secondary">{profile?"Edit university profile":"Build university profile"}</Link></div>{loading&&<p className="mt-12 text-white/50">Calculating local AI opportunity matches…</p>}{error&&<p className="mt-12 text-red-200" role="alert">{error}</p>}{!loading&&!error&&<section className="mt-14"><p className="eyebrow">AI opportunity matches</p><h2 className="display-sm mt-2">Problems aligned with your profile</h2>{!matches.length?<p className="mt-8 border border-dashed border-white/20 p-8 text-white/55">No validated opportunities are available yet.</p>:<div className="mt-8 grid gap-5 md:grid-cols-2">{matches.slice(0,6).map(x=><Link key={x.problem.id} href={`/university/problems/${x.problem.id}`} className="border border-white/10 p-6 transition-colors hover:border-blue-300/50"><p className="eyebrow">{x.problem.category} / {x.problem.location?.city}</p><h3 className="mt-3 text-lg text-white">{x.problem.title}</h3><p className="mt-4 text-2xl text-blue-100">{(x.match.overallMatchScore*100).toFixed(0)}%</p><p className="mt-2 text-sm text-white/55">AI Opportunity Match</p></Link>)}</div>}</section>}</main>}
+export default function UniversityPage(){return <ProtectedRoute allowedRole="UNIVERSITY"><Content/></ProtectedRoute>}

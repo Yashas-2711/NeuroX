@@ -12,6 +12,7 @@ const analysisSchema = z.object({
 });
 
 export type AIAnalysisResult = z.infer<typeof analysisSchema>;
+export type AIEmbeddingResult = { embedding: number[]; dimensions: 384 };
 
 export class AIServiceError extends Error {
   constructor(message: string) {
@@ -42,6 +43,19 @@ export async function analyzeProblem(title: string, description: string): Promis
       if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") throw new AIServiceError("AI service request timed out");
       throw new AIServiceError(`AI service request failed with status ${error.response?.status ?? "unavailable"}`);
     }
+    throw new AIServiceError("AI service request failed");
+  }
+}
+
+export async function generateEmbedding(text: string): Promise<AIEmbeddingResult> {
+  try {
+    const response = await axios.post(aiUrl("/embed"), { text }, { timeout: env.aiRequestTimeoutMs });
+    const parsed = z.object({ embedding: z.array(z.number().finite()).length(384), dimensions: z.literal(384) }).safeParse(response.data);
+    if (!parsed.success) throw new AIServiceError("AI service returned an invalid embedding");
+    return parsed.data;
+  } catch (error) {
+    if (error instanceof AIServiceError) throw error;
+    if (isAxiosError(error)) throw new AIServiceError(error.code === "ECONNABORTED" ? "AI service request timed out" : "AI service request failed");
     throw new AIServiceError("AI service request failed");
   }
 }

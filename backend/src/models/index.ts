@@ -121,12 +121,19 @@ const ContactSchema = new Schema(
 );
 
 export interface IUniversity {
+  user: Types.ObjectId;
   name: string;
   description?: string;
   location?: Types.ObjectId;
   departments: string[];
   expertise: string[];
   capabilities: string[];
+  domains: string[];
+  researchAreas: string[];
+  skills: string[];
+  resources: string[];
+  collaborationInterests: string[];
+  profileLocation?: { city?: string; state?: string; country?: string };
   contact?: Record<string, unknown>;
   isActive: boolean;
   createdAt: Date;
@@ -135,12 +142,23 @@ export interface IUniversity {
 
 const UniversitySchema = new Schema<IUniversity>(
   {
+    user: { type: objectId, ref: "User", required: true, unique: true, index: true },
     name: { type: String, required: true, trim: true, maxlength: 200 },
     description: { type: String, trim: true, maxlength: 5000 },
     location: { type: objectId },
     departments: { type: [String], default: [] },
     expertise: { type: [String], default: [], index: true },
     capabilities: { type: [String], default: [] },
+    domains: { type: [String], default: [], index: true },
+    researchAreas: { type: [String], default: [], index: true },
+    skills: { type: [String], default: [] },
+    resources: { type: [String], default: [] },
+    collaborationInterests: { type: [String], default: [] },
+    profileLocation: {
+      city: { type: String, trim: true, maxlength: 120 },
+      state: { type: String, trim: true, maxlength: 120 },
+      country: { type: String, trim: true, maxlength: 120 },
+    },
     contact: { type: ContactSchema },
     isActive: { type: Boolean, default: true, index: true },
   },
@@ -149,6 +167,18 @@ const UniversitySchema = new Schema<IUniversity>(
 
 UniversitySchema.index({ location: 1 });
 export const University = models.University ?? model<IUniversity>("University", UniversitySchema);
+
+export const INTEREST_STATUSES = ["PENDING", "ACCEPTED", "DECLINED"] as const;
+const UniversityInterestSchema = new Schema(
+  {
+    university: { type: objectId, ref: "University", required: true, index: true },
+    problem: { type: objectId, ref: "Problem", required: true, index: true },
+    status: { type: String, enum: INTEREST_STATUSES, default: "PENDING" },
+  },
+  { timestamps: true },
+);
+UniversityInterestSchema.index({ university: 1, problem: 1 }, { unique: true });
+export const UniversityInterest = models.UniversityInterest ?? model("UniversityInterest", UniversityInterestSchema);
 
 const IndustrySchema = new Schema(
   {
@@ -294,6 +324,7 @@ export const modelsRegistry = {
   User,
   Problem,
   University,
+  UniversityInterest,
   Industry,
   Team,
   Project,
