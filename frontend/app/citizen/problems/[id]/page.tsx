@@ -64,10 +64,50 @@ function Content() {
                 ))}
               </div>
             )}
-            <p className="mt-10 border border-blue-300/20 p-5 text-sm text-white/60">
-              AI analysis will appear after automated analysis. No AI processing
-              has run yet.
-            </p>
+            {item.aiAnalysis?.status === "COMPLETED" && (
+              <section
+                className="mt-10 border border-blue-300/20 p-5"
+                aria-labelledby="ai-analysis-heading"
+              >
+                <p id="ai-analysis-heading" className="eyebrow">
+                  Automated analysis
+                </p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Classification</p>
+                    <p className="mt-2 text-white/80">{item.aiAnalysis.category ?? "Unavailable"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Confidence</p>
+                    <p className="mt-2 text-white/80">
+                      {typeof item.aiAnalysis.confidence === "number"
+                        ? `${(item.aiAnalysis.confidence * 100).toFixed(1)}%`
+                        : "Unavailable"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Embedding</p>
+                    <p className="mt-2 text-white/80">
+                      {item.aiAnalysis.embeddingDimensions === 384
+                        ? "384 dimensions"
+                        : "Unavailable"}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+            {item.aiAnalysis?.status === "FAILED" && (
+              <p className="mt-10 border border-amber-300/20 p-5 text-sm text-white/60">
+                Automated analysis is temporarily unavailable. Your problem was
+                saved successfully and can be analyzed later.
+              </p>
+            )}
+            {(!item.aiAnalysis || item.aiAnalysis.status === "PENDING") && (
+              <p className="mt-10 border border-blue-300/20 p-5 text-sm text-white/60">
+                Automated analysis is still pending. Results will appear here
+                when processing is complete.
+              </p>
+            )}
           </article>
         </>
       )}

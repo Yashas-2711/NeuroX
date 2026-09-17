@@ -91,6 +91,8 @@ const ProblemSchema = new Schema(
     aiClassification: { type: String, trim: true },
     aiConfidence: { type: Number, min: 0, max: 1 },
     embedding: { type: [Number], default: undefined },
+    aiAnalysisStatus: { type: String, enum: ["PENDING", "COMPLETED", "FAILED"], default: "PENDING", index: true },
+    aiAnalyzedAt: { type: Date },
     similarProblems: [{ type: objectId, ref: "Problem" }],
     priority: { type: String, enum: PROBLEM_PRIORITIES, default: "MEDIUM" },
     status: { type: String, enum: PROBLEM_STATUSES, default: "SUBMITTED", index: true },
