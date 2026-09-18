@@ -43,7 +43,7 @@ function validId(id: string) {
 }
 
 export async function listProblems(query: AdminProblemQuery) {
-  const filter = { status: query.status };
+  const filter = query.status ? { status: query.status } : { status: { $in: ["SUBMITTED", "VALIDATED", "REJECTED"] } };
   const [items, total, submitted, validated, rejected] = await Promise.all([
     Problem.find(filter).populate("submittedBy", "name email role").sort({ createdAt: -1 }).skip((query.page - 1) * query.limit).limit(query.limit),
     Problem.countDocuments(filter),

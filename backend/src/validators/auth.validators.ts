@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const publicRoles = ["CITIZEN", "UNIVERSITY", "INDUSTRY"] as const;
+const publicRoles = ["CITIZEN", "STUDENT", "UNIVERSITY", "INDUSTRY"] as const;
 
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(120),

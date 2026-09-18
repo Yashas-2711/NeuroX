@@ -285,7 +285,7 @@ import * as React from "react";
 import axios from "axios";
 export default function Page() {
   return (
-    <ProtectedRoute allowedRole="CITIZEN">
+    <ProtectedRoute allowedRole={["CITIZEN", "STUDENT"]}>
       <Content />
     </ProtectedRoute>
   );

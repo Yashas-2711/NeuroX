@@ -1,0 +1,8 @@
+import type { Problem } from "@/types/problem";
+export type ProjectStatus="PROPOSED"|"ACTIVE"|"ON_HOLD"|"COMPLETED"|"CANCELLED";
+export type MilestoneStatus="PENDING"|"IN_PROGRESS"|"COMPLETED";
+export interface TeamMember { user:{_id:string;name:string;email:string;role?:string}|string; role:"LEADER"|"MEMBER"; joinedAt:string }
+export interface Team { _id:string; name:string; leader:{name:string;email:string}|string; members:TeamMember[] }
+export interface Milestone { _id:string; title:string; description?:string; type:string; status:MilestoneStatus; dueDate?:string; completedAt?:string; order:number }
+export interface Project { id:string; title:string; description:string; problem:Problem|string; university:{name?:string}|string; createdBy:{name?:string;email?:string}|string; status:ProjectStatus; startDate?:string; targetEndDate?:string; team?:Team|null; milestones:Milestone[]; progress:number; totalMilestones:number; completedMilestones:number; pendingMilestones:number; overdueMilestones:number; createdAt:string; updatedAt:string }
+export interface StudentTeam { id:string; name:string; leader:{name:string;email:string;role?:string}|string; members:TeamMember[]; project:{id:string; title:string; description:string; problem:{title:string;description:string;category:string;location?:{city?:string;state?:string;country?:string};status:string}|string; university:{name?:string;profileLocation?:{city?:string;state?:string;country?:string}}|string; status:ProjectStatus; startDate?:string; targetEndDate?:string; progress:number; totalMilestones:number; completedMilestones:number; pendingMilestones:number; overdueMilestones:number} }

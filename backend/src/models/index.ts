@@ -2,7 +2,7 @@ import { model, models, Schema, Types } from "mongoose";
 
 const objectId = Schema.Types.ObjectId;
 
-export const USER_ROLES = ["CITIZEN", "UNIVERSITY", "INDUSTRY", "ADMIN"] as const;
+export const USER_ROLES = ["CITIZEN", "STUDENT", "UNIVERSITY", "INDUSTRY", "ADMIN"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export interface IUser {
@@ -197,19 +197,29 @@ const IndustrySchema = new Schema(
 IndustrySchema.index({ location: 1 });
 export const Industry = models.Industry ?? model("Industry", IndustrySchema);
 
+const TeamMemberSchema = new Schema(
+  {
+    user: { type: objectId, ref: "User", required: true },
+    role: { type: String, enum: ["LEADER", "MEMBER"], required: true },
+    joinedAt: { type: Date, default: Date.now },
+  },
+  { _id: false },
+);
+
 const TeamSchema = new Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 160 },
+    project: { type: objectId, ref: "Project", required: true, unique: true, index: true },
     university: { type: objectId, ref: "University", required: true, index: true },
-    members: [{ type: objectId, ref: "User" }],
-    facultyMentor: { type: objectId, ref: "User" },
+    leader: { type: objectId, ref: "User", required: true },
+    members: { type: [TeamMemberSchema], default: [] },
   },
   { timestamps: true },
 );
 
 export const Team = models.Team ?? model("Team", TeamSchema);
 
-export const PROJECT_STATUSES = ["PLANNING", "RESEARCH", "PROTOTYPING", "DEPLOYMENT", "COMPLETED", "ON_HOLD"] as const;
+export const PROJECT_STATUSES = ["PROPOSED", "ACTIVE", "ON_HOLD", "COMPLETED", "CANCELLED"] as const;
 
 const MilestoneReferenceSchema = new Schema(
   {
@@ -225,8 +235,13 @@ const MilestoneReferenceSchema = new Schema(
 
 const ProjectSchema = new Schema(
   {
+    title: { type: String, required: true, trim: true, maxlength: 200 },
+    description: { type: String, required: true, trim: true, maxlength: 10000 },
     problem: { type: objectId, ref: "Problem", required: true, index: true },
     university: { type: objectId, ref: "University", required: true, index: true },
+    createdBy: { type: objectId, ref: "User", required: true, index: true },
+    startDate: { type: Date },
+    targetEndDate: { type: Date },
     facultyMentor: { type: objectId, ref: "User" },
     studentTeam: { type: objectId, ref: "Team" },
     industryPartner: { type: objectId, ref: "Industry" },
@@ -235,7 +250,7 @@ const ProjectSchema = new Schema(
     progressUpdates: { type: [String], default: [] },
     issues: { type: [String], default: [] },
     impact: { type: objectId, ref: "ImpactMetric" },
-    status: { type: String, enum: PROJECT_STATUSES, default: "PLANNING", index: true },
+    status: { type: String, enum: PROJECT_STATUSES, default: "PROPOSED", index: true },
   },
   { timestamps: true },
 );
@@ -253,6 +268,7 @@ const MilestoneSchema = new Schema(
     type: { type: String, enum: MILESTONE_TYPES, required: true },
     status: { type: String, enum: ["PENDING", "IN_PROGRESS", "COMPLETED"], default: "PENDING" },
     dueDate: { type: Date },
+    order: { type: Number, default: 0 },
     completedAt: { type: Date },
   },
   { timestamps: true },

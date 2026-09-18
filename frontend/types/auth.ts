@@ -1,4 +1,4 @@
-export const USER_ROLES = ["CITIZEN", "UNIVERSITY", "INDUSTRY", "ADMIN"] as const;
+export const USER_ROLES = ["CITIZEN", "STUDENT", "UNIVERSITY", "INDUSTRY", "ADMIN"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 export type PublicUserRole = Exclude<UserRole, "ADMIN">;
 

@@ -5,6 +5,8 @@ import authRouter from "./auth.routes";
 import problemRouter from "./problem.routes";
 import adminProblemRouter from "./admin-problem.routes";
 import universityRouter from "./university.routes";
+import projectRouter from "./project.routes";
+import studentRouter from "./student.routes";
 
 const apiRouter = Router();
 
@@ -21,5 +23,7 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/problems", problemRouter);
 apiRouter.use("/admin/problems", adminProblemRouter);
 apiRouter.use("/university", universityRouter);
+apiRouter.use("/university/projects", projectRouter);
+apiRouter.use("/student", studentRouter);
 
 export default apiRouter;

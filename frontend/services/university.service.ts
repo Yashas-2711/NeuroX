@@ -6,4 +6,5 @@ export async function updateUniversityProfile(input:UniversityProfile){const r=a
 export async function getUniversityProblems(params:Record<string,string|number>={}){const r=await apiClient.get<{data:{problems:Problem[];pagination:unknown}}>("/university/problems",{params});return r.data.data}
 export async function getUniversityProblem(id:string){const r=await apiClient.get<{data:{problem:Problem}}>(`/university/problems/${id}`);return r.data.data.problem}
 export async function getUniversityMatches(){const r=await apiClient.get<{data:{matches:Match[]}}>("/university/matches");return r.data.data.matches}
-export async function expressInterest(id:string){const r=await apiClient.post(`/university/problems/${id}/interest`);return r.data}
+export async function expressInterest(id:string){const r=await apiClient.post<{data:{interest:{_id:string};project:{_id:string}}}>(`/university/problems/${id}/interest`);return r.data.data}
+export async function searchUniversityMembers(query:string){const r=await apiClient.get<{data:{users:{id:string;name:string;email:string;role:"STUDENT"|"UNIVERSITY"}[]}}>("/university/members/search",{params:{q:query}});return r.data.data.users}

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const adminProblemQuerySchema = z.object({
-  status: z.enum(["SUBMITTED", "VALIDATING", "VALIDATED", "REJECTED", "MATCHED", "IN_PROGRESS", "RESOLVED", "ARCHIVED"]).default("SUBMITTED"),
+  status: z.enum(["SUBMITTED", "VALIDATING", "VALIDATED", "REJECTED", "MATCHED", "IN_PROGRESS", "RESOLVED", "ARCHIVED"]).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

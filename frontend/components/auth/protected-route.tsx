@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import type { UserRole } from "@/types/auth";
 
-export function ProtectedRoute({ allowedRole, children }: { allowedRole: UserRole; children: ReactNode }) {
+export function ProtectedRoute({ allowedRole, children }: { allowedRole: UserRole | UserRole[]; children: ReactNode }) {
   const router = useRouter();
   const { user, hydrated } = useAuth();
 
@@ -20,7 +20,8 @@ export function ProtectedRoute({ allowedRole, children }: { allowedRole: UserRol
     return <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6"><p className="eyebrow">Checking authentication...</p></main>;
   }
 
-  if (user.role !== allowedRole) {
+  const allowed = Array.isArray(allowedRole) ? allowedRole : [allowedRole];
+  if (!allowed.includes(user.role)) {
     return (
       <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-24">
         <section className="w-full max-w-2xl border border-hairline bg-surface p-8 md:p-12">

@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../middleware/auth";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { create, getMine, listMine } from "../controllers/problem.controller";
+import { create, getMine, getProgress, listMine } from "../controllers/problem.controller";
 const router = Router();
-const citizen = [requireAuth, requireRole("CITIZEN")];
+const citizen = [requireAuth, requireRole("CITIZEN", "STUDENT")];
 router.post("/", ...citizen, asyncHandler(create));
 router.get("/my", ...citizen, asyncHandler(listMine));
+router.get("/:id/progress", ...citizen, asyncHandler(getProgress));
 router.get("/:id", ...citizen, asyncHandler(getMine));
 export default router;

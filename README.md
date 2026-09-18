@@ -1,179 +1,199 @@
 # NeuroX — Societal Innovation Collaboration Platform
 
 **Problem Statement ID:** 26043
-**Platform Type:** Responsive Web Platform for Crowdsourcing & Societal Innovation  
 
-## Step 1 Foundation Status
+NeuroX is a local-AI-powered platform for collecting societal problems, validating them, matching them with universities, and managing university-led innovation projects.
 
-Repository structure, dependency manifests, environment templates, and isolated runtime environments are being verified as the Step 1 foundation. Authentication, business APIs, database models, AI endpoints, and dashboards are outside the scope of this step.
+## Current implementation status
 
----
+Steps 1–11 are implemented:
 
-## 📋 Overview
+- Project setup, frontend, backend, MongoDB models, and security foundation
+- JWT authentication and role-based access control
+- Citizen and Student problem submission
+- Local BERT-Tiny classification and MiniLM embeddings
+- Node/Express ↔ FastAPI AI integration
+- Admin validation portal
+- University profiles, validated problem discovery, and AI Opportunity Matching
+- University interest and project creation
+- University teams, Student members, milestones, status transitions, and progress calculation
+- Student multi-team workspace and read-only problem/project progress tracking
 
-**NeuroX** is an open societal innovation collaboration platform designed to bridge the gap between citizens, academic institutions, industry partners, and government administrators. It empowers citizens to submit real-world societal challenges while enabling universities and industry leaders to collaborate on solutions, share research, and execute impact-driven projects.
+Step 12, Industry Collaboration, is not implemented.
 
----
+## Roles
 
-## 🎯 Main Objective
+- **Citizen:** Submit problems and track the progress of owned submissions.
+- **Student:** Submit problems, view owned problem progress, and participate in multiple university project teams.
+- **University:** Maintain an institution profile, discover validated problems, express interest, create projects, manage teams, and manage milestones for owned projects.
+- **Industry:** Role foundation exists; Industry Collaboration is deferred.
+- **Admin:** Review, validate, or reject submitted problems.
 
-To crowdsource, categorize, analyze, and solve pressing societal challenges by leveraging intelligent AI-driven problem matching, structured project collaboration, and transparent multi-stakeholder workflows.
-
----
-
-## 🌟 Key Features
-
-* **Citizen Problem Crowdsourcing:** Multi-step problem submission with media uploads, location tagging, and domain categorization.
-* **AI-Powered Analysis Engine:** 
-  * Problem classification via **BERT-Tiny**.
-  * Semantic embedding generation (384-d) via **MiniLM**.
-  * Real-time duplicate & related problem detection using cosine similarity search.
-  * Automated matching of problems to relevant university research departments.
-* **Multi-Stakeholder Portals:**
-  * **Citizen Portal:** Submit challenges, track resolution progress, upvote issues.
-  * **University Portal:** Discover matched challenges, propose research projects, assign faculty/students.
-  * **Industry Portal:** Co-fund initiatives, sponsor projects, sponsor internships/R&D.
-  * **Admin Dashboard:** Moderation, analytics, platform governance, verification.
-* **Interactive Geographic & Analytics Dashboards:** Heatmaps, regional distribution charts, and impact metrics.
-
----
-
-## 👥 User Roles
-
-1. **Citizen:** Submits regional/societal problems, monitors progress, provides feedback.
-2. **University Partner:** Explores AI-matched problems, submits R&D proposals, executes solutions.
-3. **Industry Partner:** Provides funding, technical sponsorship, and commercialization pathways.
-4. **Administrator:** Moderates platform content, validates user profiles, manages system metrics.
-
----
-
-## 🛠️ Technology Stack
-
-* **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Motion, Lucide React, Recharts, Leaflet / React-Leaflet.
-* **Backend:** Node.js, Express, TypeScript, Mongoose ODM, MongoDB Atlas, JWT Authentication, bcryptjs, Multer, Helmet, Morgan, Express-Rate-Limit.
-* **AI Microservice:** Python 3.13, FastAPI, PyTorch, HuggingFace Transformers (`BERT-Tiny`), Sentence-Transformers (`all-MiniLM-L6-v2`), Scikit-learn, NumPy, Pandas, PyMongo.
-* **Tooling & Environments:** Git/GitHub, npm, pip, `.venv`.
-
----
-
-## 🏗️ System Architecture
+## Architecture
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                    User Layer (Web UI)                      │
-│       Citizens | Universities | Industry | Admin            │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ HTTP / REST APIs
-┌──────────────────────────────▼──────────────────────────────┐
-│                    Next.js Frontend                         │
-│       (App Router, Tailwind CSS, shadcn/ui, Recharts)       │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ REST API Requests
-┌──────────────────────────────▼──────────────────────────────┐
-│                   Express Backend API                       │
-│    (Auth, Middleware, Mongoose, Controllers, Routing)       │
-└──────────────┬──────────────────────────────┬───────────────┘
-               │                              │
-               │ Mongoose ODM                 │ HTTP REST (FastAPI)
-┌──────────────▼──────────────┐  ┌────────────▼──────────────┐
-│       MongoDB Atlas         │  │     AI Engine (FastAPI)    │
-│  (Users, Problems, Projects)│  │ (BERT-Tiny, MiniLM 384-d) │
-└─────────────────────────────┘  └────────────────────────────┘
+frontend/  Next.js + React + TypeScript + Tailwind CSS
+backend/   Node.js + Express + TypeScript + MongoDB/Mongoose
+ai/        Python + FastAPI + local BERT-Tiny + MiniLM
+docs/      Workflow and architecture documentation
 ```
-
----
-
-## 🧠 AI Architecture
 
 ```text
-Problem Description Input
-          ↓
-  BERT-Tiny Classifier (Problem Category)
-          ↓
-  MiniLM Sentence-Transformer (384-d Embedding)
-          ↓
-  Similarity Search Index (Cosine Distance)
-          ↓
-  Duplicate & Related Problem Detection
-          ↓
-  Automated University Department Matching
+Citizen/Student problem
+        ↓
+Local BERT-Tiny + MiniLM analysis
+        ↓
+Admin validation
+        ↓
+University Opportunity Match
+        ↓
+University interest
+        ↓
+Project → Team → Milestones → Progress
 ```
 
----
+AI inference remains local. The platform does not use OpenAI, Gemini, Claude, Groq, OpenRouter, or another hosted inference API.
 
-## 🚦 Project Status & Implementation Lifecycle
+## Important routes
 
-| Feature Layer | Status | Notes |
-| :--- | :--- | :--- |
-| Repository & Environment Setup | **Implemented** | Frontend, Backend, AI Virtual Environment configured & verified |
-| Package Dependencies & Types | **Implemented** | Next.js 16, Express TypeScript, FastAPI PyTorch stack locked |
-| Database Models & Schemas | **In Development** | MongoDB Mongoose models for User, Problem, Project, Solution |
-| User Authentication & RBAC | **In Development** | JWT-based auth flow & role-based middleware |
-| Problem Submission & Feeds | **Planned** | Frontend forms with Zod validation & Axios integration |
-| AI Microservice Endpoints | **Planned** | FastAPI routes for `/classify`, `/embed`, and `/match` |
-| Geo-Mapping & Analytics | **Planned** | Leaflet maps & Recharts analytics dashboards |
+Frontend:
 
----
+- `/login`, `/register`
+- `/citizen`, `/citizen/problems`, `/citizen/problems/new`
+- `/student`, `/student/teams`
+- `/university`, `/university/profile`, `/university/problems`, `/university/projects`
+- `/admin`, `/admin/problems/[id]`
 
-## 📁 Project Structure
+Backend API groups:
 
-```text
-NeuroX — Societal Innovation Collaboration Platform/
-├── frontend/             # Next.js 16 App Router UI
-├── backend/              # Node.js + Express + TypeScript API
-├── ai/                   # Python FastAPI + PyTorch AI Engine
-├── docs/                 # Platform documentation & specs
-├── .gitignore            # Git ignore specification
-├── README.md             # Project overview
-├── SETUP.md              # Detailed setup guide
-├── TECH_STACK.md         # Technology dependency audit
-├── CONTRIBUTING.md       # Collaboration & Git workflow
-└── PROJECT_STRUCTURE.md  # Architectural layout reference
-```
+- `/api/auth`
+- `/api/problems`
+- `/api/admin/problems`
+- `/api/university`
+- `/api/university/projects`
+- `/api/student/teams`
 
----
+AI service:
 
-## ⚙️ Quick Start
+- `GET /health`
+- `POST /classify`
+- `POST /embed`
+- `POST /similar`
+- `POST /analysis`
 
-### 1. Prerequisites
-- Node.js `v22.x+`
-- Python `3.13+`
-- Git `2.48+`
+## Quick start
 
-### 2. Running Services
+Prerequisites:
 
-#### Frontend
-```powershell
-cd frontend
-npm install
-npm run dev
-```
+- Node.js 22+
+- Python 3.13+
+- MongoDB connection configured in `backend/.env`
 
-#### Backend
+Install JavaScript dependencies:
+
 ```powershell
 cd backend
 npm install
+
+cd ..\frontend
+npm install
+```
+
+Start the backend in one terminal:
+
+```powershell
+cd "P:\NeuroX — Societal Innovation Collaboration Platform\backend"
 npm run dev
 ```
 
-#### AI Engine
+Start the frontend in a second terminal:
+
 ```powershell
-cd ai
-.\.venv\Scripts\Activate.ps1
-uvicorn main:app --reload --port 8000
+cd "P:\NeuroX — Societal Innovation Collaboration Platform\frontend"
+npm run dev
 ```
 
----
+Start the local AI service in a third terminal:
 
-## 🔒 Security & Best Practices
+```powershell
+cd "P:\NeuroX — Societal Innovation Collaboration Platform\ai"
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+& ".\.venv\Scripts\Activate.ps1"
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
 
-- Environment secrets stored exclusively in local `.env` files (never committed).
-- Template variable specs provided in `.env.example` across services.
-- Rate limiting (`express-rate-limit`) and security headers (`helmet`) applied on the API layer.
-- Password hashing enforced via `bcryptjs` with standard salt rounds.
+Open the web application at `http://localhost:3000`.
 
----
+The backend runs on `http://localhost:5000` and the AI service runs on `http://127.0.0.1:8000`.
 
-## 📄 License & Attribution
+## Step 11 test flow
 
-Developed for **Problem Statement ID: 26043** — NeuroX Societal Innovation Collaboration Platform.
+1. Register a Student and a University user.
+2. Complete the University profile.
+3. Validate a submitted problem from `/admin`.
+4. Express interest as the University.
+5. Open the created project.
+6. Create a project team and add the Student.
+7. Open `/student/teams` and verify the team appears.
+8. Add and complete milestones from the University project workspace.
+9. Verify project progress updates.
+10. Open the original problem as its submitter and verify lifecycle/project progress.
+11. Verify Students cannot edit projects, teams, or milestones.
+12. Verify another user cannot view the problem owner's private progress.
+
+## Verification commands
+
+Backend:
+
+```powershell
+cd backend
+npm run type-check
+npm run build
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run lint
+npm run type-check
+npm run build
+```
+
+AI tests:
+
+```powershell
+cd ai
+& ".\.venv\Scripts\python.exe" -m unittest discover -s tests -v
+```
+
+Git safety check:
+
+```powershell
+git diff --check
+git status --short
+```
+
+## Security
+
+- Secrets belong only in ignored `.env` files.
+- Passwords are stored as bcrypt hashes.
+- JWTs and password hashes are excluded from API responses.
+- Protected endpoints use the existing JWT and RBAC middleware.
+- Ownership checks are enforced on private problems and university projects.
+- Student team data is read-only from the Student workspace.
+- No external AI inference APIs or hardcoded credentials are used.
+
+## Documentation
+
+Useful workflow documentation is available in `docs/`, including:
+
+- `docs/AI_ENGINE.md`
+- `docs/AI_BACKEND_INTEGRATION.md`
+- `docs/ADMIN_VALIDATION.md`
+- `docs/UNIVERSITY_MATCHING.md`
+- `docs/TEAM_PROJECT_MANAGEMENT.md`
+
+## License and attribution
+
+Developed for **Problem Statement ID 26043** — NeuroX Societal Innovation Collaboration Platform.

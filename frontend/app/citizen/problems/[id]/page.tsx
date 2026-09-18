@@ -3,17 +3,20 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/auth/protected-route";
-import { getProblem } from "@/services/problem.service";
+import { getProblem, getProblemProgress } from "@/services/problem.service";
+import { ProblemProgressTracker } from "@/components/problems/problem-progress";
 import type { Problem } from "@/types/problem";
+import type { ProblemProgress } from "@/types/problem";
 function Content() {
   const p = useParams<{ id: string }>();
   const id = Array.isArray(p.id) ? p.id[0] : p.id;
   const [item, setItem] = useState<Problem | null>(null);
+  const [progress, setProgress] = useState<ProblemProgress | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
     if (id)
-      getProblem(id)
-        .then(setItem)
+      Promise.all([getProblem(id), getProblemProgress(id)])
+        .then(([problem, tracking]) => { setItem(problem); setProgress(tracking); })
         .catch(() => setError("Unable to load this problem."));
   }, [id]);
   return (
@@ -108,6 +111,10 @@ function Content() {
                 when processing is complete.
               </p>
             )}
+            {progress && <ProblemProgressTracker progress={progress} />}
+            {progress && progress.projects.length === 0 && <p className="mt-5 text-sm text-white/55">Your problem has been submitted and is waiting for university matching.</p>}
+            {progress && progress.projects.length > 0 && progress.projects.every((project) => !project.team) && <p className="mt-5 text-sm text-white/55">A university project has been created. Team formation is pending.</p>}
+            {progress && progress.projects.length > 0 && <section className="mt-6 border border-white/10 p-5"><p className="eyebrow">University project progress</p>{progress.projects.map((project) => <div key={project.id} className="mt-4 border-t border-white/10 pt-4"><p className="text-white">{project.title}</p><p className="mt-1 text-sm text-white/55">{project.status} · {project.progress}% · {project.completedMilestones}/{project.totalMilestones} milestones complete</p></div>)}</section>}
           </article>
         </>
       )}
@@ -116,7 +123,7 @@ function Content() {
 }
 export default function Page() {
   return (
-    <ProtectedRoute allowedRole="CITIZEN">
+    <ProtectedRoute allowedRole={["CITIZEN", "STUDENT"]}>
       <Content />
     </ProtectedRoute>
   );

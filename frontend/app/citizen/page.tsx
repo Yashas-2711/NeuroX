@@ -58,7 +58,7 @@ function Dashboard() {
 }
 export default function Page() {
   return (
-    <ProtectedRoute allowedRole="CITIZEN">
+    <ProtectedRoute allowedRole={["CITIZEN", "STUDENT"]}>
       <Dashboard />
     </ProtectedRoute>
   );

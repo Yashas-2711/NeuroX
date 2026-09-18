@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { AppError } from "../utils/app-error";
 import * as service from "../services/admin-problem.service";
 import { adminProblemQuerySchema, rejectionSchema } from "../validators/admin.validators";
+import { getAdminProblemProgress } from "../services/problem.service";
 
 function adminId(request: Request) {
   if (!request.auth) throw new AppError("Authentication required", 401);
@@ -16,6 +17,10 @@ export async function list(request: Request, response: Response) {
 
 export async function detail(request: Request, response: Response) {
   response.json({ success: true, data: { problem: await service.getProblem(request.params.id as string) } });
+}
+
+export async function progress(request: Request, response: Response) {
+  response.json({ success: true, data: await getAdminProblemProgress(request.params.id as string) });
 }
 
 export async function validate(request: Request, response: Response) {
