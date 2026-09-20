@@ -40,6 +40,7 @@ function Content() {
           </p>
           <h1 className="display-md mt-3">{item.title}</h1>
           <Link href={`/citizen/problems/${id}/passport`} className="button-secondary mt-6 inline-flex">Open Challenge Passport</Link>
+          <Link href={`/citizen/problems/${id}/impact`} className="button-secondary ml-3 mt-6 inline-flex">View Impact Twin</Link>
           <p className="mt-5 text-white/55">
             {item.location.city}, {item.location.state}, {item.location.country}{" "}
             · Priority {item.priority}

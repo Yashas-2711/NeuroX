@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Collaboration, Industry, Milestone, Problem, Project, Solution, Team, University, UniversityInterest } from "../models";
+import { Collaboration, ImpactIndicator, ImpactObservation, ImpactScenario, Industry, Milestone, Problem, Project, Solution, Team, University, UniversityInterest } from "../models";
 import { AppError } from "../utils/app-error";
 
 type Actor = { userId: string; role: string };
@@ -13,6 +13,11 @@ export async function getPassport(problemId: string, actor: Actor) {
   const collaborations = projects.length ? await Collaboration.find({ project: { $in: projects.map((project) => project._id) } }).populate("industry", "name profileLocation").sort({ createdAt: 1 }) : [];
   const solutions = projects.length ? await Solution.find({ project: { $in: projects.map((project) => project._id) } }).sort({ createdAt: 1 }) : [];
   await authorize(problem, projects, collaborations, actor);
+  const [impactIndicators, impactScenarios, impactObservations] = await Promise.all([
+    ImpactIndicator.find({ problem: problem._id }).sort({ createdAt: 1 }),
+    ImpactScenario.find({ problem: problem._id }).sort({ createdAt: 1 }),
+    ImpactObservation.find({ problem: problem._id }).populate("indicator", "name unit").sort({ measurementDate: 1, createdAt: 1 }),
+  ]);
 
   const events: PassportEvent[] = [{ type: "PROBLEM_SUBMITTED", status: "SUBMITTED", timestamp: problem.createdAt, title: "Problem submitted", detail: problem.title }];
   if (problem.aiAnalysisStatus === "COMPLETED" && problem.aiAnalyzedAt) events.push({ type: "AI_ANALYSIS_COMPLETED", status: "COMPLETED", timestamp: problem.aiAnalyzedAt, title: "AI analysis completed", detail: problem.aiClassification ? `Classified as ${problem.aiClassification}` : undefined });
@@ -33,6 +38,15 @@ export async function getPassport(problemId: string, actor: Actor) {
     if (solution.reviewedAt) events.push({ type: "SOLUTION_REVIEWED", status: solution.status, timestamp: solution.reviewedAt, title: `Solution ${solution.status.toLowerCase()}`, detail: solution.title, relatedId: solution._id.toString(), relatedType: "SOLUTION" });
     if (solution.stageUpdatedAt) events.push({ type: "SOLUTION_STAGE_CHANGED", status: solution.status, timestamp: solution.stageUpdatedAt, title: `Solution moved to ${solution.status.toLowerCase()}`, detail: solution.title, relatedId: solution._id.toString(), relatedType: "SOLUTION" });
   });
+  impactIndicators.forEach((indicator: any) => {
+    events.push({ type: "IMPACT_BASELINE_CREATED", status: "RECORDED", timestamp: indicator.createdAt, title: "Impact baseline created", detail: `${indicator.name} (${indicator.unit})`, relatedId: indicator._id.toString(), relatedType: "IMPACT_INDICATOR" });
+    if (indicator.updatedAt && new Date(indicator.updatedAt).getTime() > new Date(indicator.createdAt).getTime()) events.push({ type: "IMPACT_BASELINE_UPDATED", status: "UPDATED", timestamp: indicator.updatedAt, title: "Impact baseline updated", detail: indicator.name, relatedId: indicator._id.toString(), relatedType: "IMPACT_INDICATOR" });
+  });
+  impactScenarios.forEach((scenario: any) => {
+    events.push({ type: "IMPACT_SCENARIO_CREATED", status: "ESTIMATE", timestamp: scenario.createdAt, title: "Impact scenario created", detail: scenario.name, relatedId: scenario._id.toString(), relatedType: "IMPACT_SCENARIO" });
+    if (scenario.updatedAt && new Date(scenario.updatedAt).getTime() > new Date(scenario.createdAt).getTime()) events.push({ type: "IMPACT_SCENARIO_UPDATED", status: "UPDATED", timestamp: scenario.updatedAt, title: "Impact scenario updated", detail: scenario.name, relatedId: scenario._id.toString(), relatedType: "IMPACT_SCENARIO" });
+  });
+  impactObservations.forEach((observation: any) => events.push({ type: "IMPACT_OBSERVATION_RECORDED", status: "OBSERVED", timestamp: observation.createdAt, title: "Impact observation recorded", detail: observation.indicator?.name ? `${observation.indicator.name}: ${observation.observedValue} ${observation.indicator.unit}` : undefined, relatedId: observation._id.toString(), relatedType: "IMPACT_OBSERVATION" }));
   events.sort((a, b) => {
     const timestampOrder = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     if (timestampOrder !== 0) return timestampOrder;

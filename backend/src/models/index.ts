@@ -436,6 +436,59 @@ const ImpactMetricSchema = new Schema(
 
 export const ImpactMetric = models.ImpactMetric ?? model("ImpactMetric", ImpactMetricSchema);
 
+const ImpactIndicatorSchema = new Schema(
+  {
+    problem: { type: objectId, ref: "Problem", required: true, index: true },
+    name: { type: String, required: true, trim: true, maxlength: 160 },
+    description: { type: String, trim: true, maxlength: 2000 },
+    unit: { type: String, required: true, trim: true, maxlength: 80 },
+    baselineValue: { type: Number, required: true, finite: true },
+    targetValue: { type: Number, default: null },
+    measurementPeriod: { type: String, trim: true, maxlength: 160 },
+    evidenceReference: { type: String, trim: true, maxlength: 1000 },
+    responsibleStakeholder: { type: String, trim: true, maxlength: 200 },
+    createdBy: { type: objectId, ref: "User", required: true },
+    updatedBy: { type: objectId, ref: "User" },
+  },
+  { timestamps: true },
+);
+ImpactIndicatorSchema.index({ problem: 1, name: 1, unit: 1 }, { unique: true });
+export const ImpactIndicator = models.ImpactIndicator ?? model("ImpactIndicator", ImpactIndicatorSchema);
+
+const ImpactScenarioSchema = new Schema(
+  {
+    problem: { type: objectId, ref: "Problem", required: true, index: true },
+    name: { type: String, required: true, trim: true, maxlength: 160 },
+    description: { type: String, trim: true, maxlength: 3000 },
+    proposedIntervention: { type: String, required: true, trim: true, maxlength: 5000 },
+    expectedValues: { type: Map, of: Number, default: {} },
+    assumptions: { type: [String], default: [] },
+    estimationMethod: { type: String, required: true, trim: true, maxlength: 1000 },
+    confidenceLevel: { type: Number, min: 0, max: 1 },
+    uncertaintyRange: { min: Number, max: Number },
+    estimatedTimeline: { type: String, trim: true, maxlength: 160 },
+    createdBy: { type: objectId, ref: "User", required: true },
+  },
+  { timestamps: true },
+);
+ImpactScenarioSchema.index({ problem: 1, createdAt: -1 });
+export const ImpactScenario = models.ImpactScenario ?? model("ImpactScenario", ImpactScenarioSchema);
+
+const ImpactObservationSchema = new Schema(
+  {
+    problem: { type: objectId, ref: "Problem", required: true, index: true },
+    indicator: { type: objectId, ref: "ImpactIndicator", required: true, index: true },
+    observedValue: { type: Number, required: true, finite: true },
+    measurementDate: { type: Date, required: true, index: true },
+    evidenceReference: { type: String, trim: true, maxlength: 1000 },
+    notes: { type: String, trim: true, maxlength: 3000 },
+    recordedBy: { type: objectId, ref: "User", required: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+);
+ImpactObservationSchema.index({ problem: 1, indicator: 1, measurementDate: -1 });
+export const ImpactObservation = models.ImpactObservation ?? model("ImpactObservation", ImpactObservationSchema);
+
 export const modelsRegistry = {
   User,
   Problem,
@@ -451,4 +504,7 @@ export const modelsRegistry = {
   Collaboration,
   Notification,
   ImpactMetric,
+  ImpactIndicator,
+  ImpactScenario,
+  ImpactObservation,
 };

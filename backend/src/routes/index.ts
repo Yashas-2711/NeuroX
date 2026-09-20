@@ -11,6 +11,7 @@ import industryRouter from "./industry.routes";
 import collaborationRouter from "./collaboration.routes";
 import { projectSolutionRouter, solutionRouter } from "./solution.routes";
 import notificationRouter from "./notification.routes";
+import impactRouter from "./impact.routes";
 
 const apiRouter = Router();
 
@@ -25,6 +26,7 @@ apiRouter.get("/", (_request, response) => {
 apiRouter.use(healthRouter);
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/problems", problemRouter);
+apiRouter.use("/problems", impactRouter);
 apiRouter.use("/admin/problems", adminProblemRouter);
 apiRouter.use("/university", universityRouter);
 apiRouter.use("/university/projects", projectRouter);
