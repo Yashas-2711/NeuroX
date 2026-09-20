@@ -48,7 +48,7 @@ export async function unreadCount(userId: string) { return Notification.countDoc
 
 export async function markRead(userId: string, id: string) {
   if (!Types.ObjectId.isValid(id)) throw new AppError("Invalid notification ID", 400);
-  const result = await Notification.findOneAndUpdate({ _id: id, recipient: new Types.ObjectId(userId) }, { isRead: true }, { new: true });
+  const result = await Notification.findOneAndUpdate({ _id: id, recipient: new Types.ObjectId(userId) }, { isRead: true }, { returnDocument: "after" });
   if (!result) throw new AppError("Notification not found", 404);
   return safe(result);
 }

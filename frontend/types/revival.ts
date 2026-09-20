@@ -1,0 +1,3 @@
+export type RevivalStatus = "FLAGGED" | "UNDER_REVIEW" | "REVIVAL_PROPOSED" | "REVIVAL_IN_PROGRESS" | "REVIVED" | "CLOSED";
+export type RevivalChallenge = { problem: { id: string; title: string; status: string; updatedAt: string }; flagged: boolean; signals: string[]; lastActivityAt: string; ageDays: number; review?: { status: RevivalStatus; reviewNotes?: string; blockers: string[]; proposedActions: string[] } | null };
+export type RevivalDetail = { problem: { id: string; title: string; status: string }; detection: { flagged: boolean; signals: string[]; lastActivityAt: string; ageDays: number }; review: RevivalChallenge["review"]; recommendations: { actions: string[]; evidence: Record<string, boolean | number> } };

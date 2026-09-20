@@ -12,6 +12,8 @@ import collaborationRouter from "./collaboration.routes";
 import { projectSolutionRouter, solutionRouter } from "./solution.routes";
 import notificationRouter from "./notification.routes";
 import impactRouter from "./impact.routes";
+import revivalRouter from "./revival.routes";
+import communicationRouter from "./communication.routes";
 
 const apiRouter = Router();
 
@@ -27,6 +29,8 @@ apiRouter.use(healthRouter);
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/problems", problemRouter);
 apiRouter.use("/problems", impactRouter);
+apiRouter.use("/revival", revivalRouter);
+apiRouter.use("/projects", communicationRouter);
 apiRouter.use("/admin/problems", adminProblemRouter);
 apiRouter.use("/university", universityRouter);
 apiRouter.use("/university/projects", projectRouter);

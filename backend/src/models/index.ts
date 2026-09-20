@@ -404,6 +404,14 @@ CollaborationSchema.index({ project: 1, status: 1 });
 
 export const Collaboration = models.Collaboration ?? model("Collaboration", CollaborationSchema);
 
+const ProjectMessageSchema = new Schema({
+  project: { type: objectId, ref: "Project", required: true, index: true },
+  author: { type: objectId, ref: "User", required: true, index: true },
+  body: { type: String, required: true, trim: true, maxlength: 4000 },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+ProjectMessageSchema.index({ project: 1, createdAt: -1 });
+export const ProjectMessage = models.ProjectMessage ?? model("ProjectMessage", ProjectMessageSchema);
+
 const NotificationSchema = new Schema(
   {
     recipient: { type: objectId, ref: "User", required: true, index: true },
@@ -489,6 +497,24 @@ const ImpactObservationSchema = new Schema(
 ImpactObservationSchema.index({ problem: 1, indicator: 1, measurementDate: -1 });
 export const ImpactObservation = models.ImpactObservation ?? model("ImpactObservation", ImpactObservationSchema);
 
+export const REVIVAL_STATUSES = ["FLAGGED", "UNDER_REVIEW", "REVIVAL_PROPOSED", "REVIVAL_IN_PROGRESS", "REVIVED", "CLOSED"] as const;
+const RevivalHistorySchema = new Schema({ status: { type: String, enum: REVIVAL_STATUSES, required: true }, notes: { type: String, trim: true, maxlength: 3000 }, changedBy: { type: objectId, ref: "User", required: true }, changedAt: { type: Date, default: Date.now } }, { _id: false });
+const RevivalReviewSchema = new Schema({
+  problem: { type: objectId, ref: "Problem", required: true, unique: true, index: true },
+  status: { type: String, enum: REVIVAL_STATUSES, default: "FLAGGED", index: true },
+  inactivitySignals: { type: [String], default: [] },
+  lastActivityAt: { type: Date },
+  reviewNotes: { type: String, trim: true, maxlength: 5000 },
+  blockers: { type: [String], default: [] },
+  missingCapabilities: { type: [String], default: [] },
+  proposedActions: { type: [String], default: [] },
+  assignedStakeholder: { type: objectId, ref: "User" },
+  history: { type: [RevivalHistorySchema], default: [] },
+  createdBy: { type: objectId, ref: "User", required: true },
+}, { timestamps: true });
+RevivalReviewSchema.index({ status: 1, updatedAt: -1 });
+export const RevivalReview = models.RevivalReview ?? model("RevivalReview", RevivalReviewSchema);
+
 export const modelsRegistry = {
   User,
   Problem,
@@ -502,9 +528,11 @@ export const modelsRegistry = {
   Milestone,
   Solution,
   Collaboration,
+  ProjectMessage,
   Notification,
   ImpactMetric,
   ImpactIndicator,
   ImpactScenario,
   ImpactObservation,
+  RevivalReview,
 };

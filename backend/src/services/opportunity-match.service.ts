@@ -36,7 +36,7 @@ export async function generate(problemId: string, actor: Actor, requestedType?: 
         const sourceUpdatedAt = sourceDate(problem, dna, entity);
         const filter = type === "UNIVERSITY" ? { problem: problem._id, entityType: type, university: entity._id } : { problem: problem._id, entityType: type, industry: entity._id };
         const document = { ...filter, overallScore: match.overallMatchScore * 100, scoreBreakdown: { semantic: match.semanticScore * 100, domain: match.domainScore * 100, skills: match.skillsScore * 100, resource: match.resourceScore * 100, location: match.locationScore * 100 }, weights: match.scoringWeights, matchingReasons: match.matchingReasons, matchedCapabilities: match.matchedCapabilities, missingCapabilities: match.missingCapabilities, status: "CURRENT", sourceVersion: "step16-v1", sourceUpdatedAt, generatedAt: new Date() };
-        const saved = await OpportunityMatch.findOneAndUpdate(filter, { $set: document }, { upsert: true, new: true, setDefaultsOnInsert: true });
+        const saved = await OpportunityMatch.findOneAndUpdate(filter, { $set: document }, { upsert: true, returnDocument: "after", setDefaultsOnInsert: true });
         results.push(saved);
       } finally { activeGenerations.delete(key); }
     }

@@ -18,7 +18,7 @@ export async function saveProfile(userId: string, input: IndustryProfileInput) {
   const value = await Industry.findOneAndUpdate(
     { user },
     { $set: { name: input.organizationName, description: input.description, industryType: input.industryType, profileLocation: input.location, expertise: input.domains.concat(input.expertise), technologies: input.technologies, skills: input.skills, resources: input.resources, facilities: input.facilities, collaborationInterests: input.collaborationInterests, capabilities: input.skills } },
-    { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true, runValidators: true },
   );
   if (!value) throw new AppError("Unable to save industry profile", 500);
   return profile(value);

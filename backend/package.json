@@ -13,7 +13,9 @@
     "test:step14": "tsx scripts/step14-runtime.ts",
     "test:step15": "tsx scripts/step15-runtime.ts",
     "test:step16": "tsx scripts/step16-runtime.ts",
-    "test:step17": "tsx scripts/step17-runtime.ts"
+    "test:step17": "tsx scripts/step17-runtime.ts",
+    "test:step18": "tsx scripts/step18-runtime.ts",
+    "test:step19": "tsx scripts/step19-runtime.ts"
   },
   "keywords": [],
   "type": "commonjs",

@@ -1,0 +1,11 @@
+import { Router } from "express";
+import { requireAuth } from "../middleware/auth";
+import { asyncHandler } from "../middleware/asyncHandler";
+import * as controller from "../controllers/revival.controller";
+const router = Router();
+router.use(requireAuth);
+router.get("/", asyncHandler(controller.list));
+router.get("/:problemId", asyncHandler(controller.get));
+router.post("/:problemId/review", asyncHandler(controller.create));
+router.patch("/:problemId/review", asyncHandler(controller.update));
+export default router;

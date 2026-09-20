@@ -15,7 +15,7 @@ export async function saveProfile(userId: string, input: UniversityProfileInput)
   const university = await University.findOneAndUpdate(
     { user },
     { $set: { name: input.institutionName, description: input.description, profileLocation: input.location, domains: input.domains, researchAreas: input.researchAreas, skills: input.skills, resources: input.resources, collaborationInterests: input.collaborationInterests, departments: input.domains, expertise: input.researchAreas, capabilities: input.skills } },
-    { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true },
+    { returnDocument: "after", upsert: true, setDefaultsOnInsert: true, runValidators: true },
   );
   if (!university) throw new AppError("Unable to save university profile", 500);
   return profile(university);
