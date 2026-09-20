@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../middleware/auth";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { create, getMine, getProgress, listMine } from "../controllers/problem.controller";
+import { create, getMine, getPassport, getProgress, listMine } from "../controllers/problem.controller";
 const router = Router();
 const citizen = [requireAuth, requireRole("CITIZEN", "STUDENT")];
+router.get("/:id/passport", requireAuth, asyncHandler(getPassport));
 router.post("/", ...citizen, asyncHandler(create));
 router.get("/my", ...citizen, asyncHandler(listMine));
 router.get("/:id/progress", ...citizen, asyncHandler(getProgress));

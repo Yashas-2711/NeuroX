@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Problem } from "../models";
 import { AppError } from "../utils/app-error";
+import { create as createNotification } from "./notification.service";
 import type { AdminProblemQuery } from "../validators/admin.validators";
 
 function safe(problem: any) {
@@ -68,6 +69,7 @@ export async function validateProblem(id: string, adminId: string) {
   problem.validatedAt = new Date();
   problem.validatedBy = new Types.ObjectId(adminId);
   await problem.save();
+  await createNotification({ recipient: problem.submittedBy.toString(), title: "Problem validated", message: `Your problem “${problem.title}” has been validated.`, type: "PROBLEM_VALIDATED", relatedType: "PROBLEM", relatedId: problem._id, dedupeKey: `problem-validated:${problem._id}` });
   return getProblem(id);
 }
 
@@ -80,5 +82,6 @@ export async function rejectProblem(id: string, adminId: string, reason: string)
   problem.rejectedBy = new Types.ObjectId(adminId);
   problem.rejectionReason = reason;
   await problem.save();
+  await createNotification({ recipient: problem.submittedBy.toString(), title: "Problem rejected", message: `Your problem “${problem.title}” was rejected.`, type: "PROBLEM_REJECTED", relatedType: "PROBLEM", relatedId: problem._id, dedupeKey: `problem-rejected:${problem._id}` });
   return getProblem(id);
 }

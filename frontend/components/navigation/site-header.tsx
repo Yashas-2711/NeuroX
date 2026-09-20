@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Bell, Menu, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
+import { getUnreadNotificationCount } from "@/services/notification.service";
 
 const links = [
   { label: "Platform", href: "#platform" },
@@ -45,6 +46,7 @@ export function SiteHeader() {
           </button>
           {showAuthenticatedActions ? (
             <>
+              <NotificationLink />
               <Link href={`/${user?.role.toLowerCase()}`} className="button-secondary">{user?.name}</Link>
               <button type="button" className="button-primary" onClick={() => void logout()}>Logout</button>
             </>
@@ -84,4 +86,10 @@ export function SiteHeader() {
       </AnimatePresence>
     </header>
   );
+}
+
+function NotificationLink() {
+  const [count, setCount] = useState(0);
+  useEffect(() => { getUnreadNotificationCount().then(setCount).catch(() => undefined); }, []);
+  return <Link href="/notifications" className="icon-button relative" aria-label={count ? `${count} unread notifications` : "Notifications"}><Bell size={17} />{count > 0 && <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-blue-400 px-1 text-center text-[10px] text-black">{count > 9 ? "9+" : count}</span>}</Link>;
 }

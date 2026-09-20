@@ -1,0 +1,3 @@
+export interface PassportEvent { type: string; status: string; timestamp: string; title: string; detail?: string; relatedId?: string; relatedType?: string }
+export interface ChallengePassport { problem: { id: string; title: string; category: string; location?: { city?: string; state?: string; country?: string }; priority?: string; status: string; aiAnalysisStatus?: string; createdAt: string; updatedAt: string }; events: PassportEvent[]; projects: { id: string; title: string; status: string; progress: number; totalMilestones: number; completedMilestones: number; team?: { id: string; name: string } | null }[] }
+

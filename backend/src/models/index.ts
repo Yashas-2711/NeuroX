@@ -343,12 +343,16 @@ const NotificationSchema = new Schema(
     title: { type: String, required: true, trim: true, maxlength: 200 },
     message: { type: String, required: true, trim: true, maxlength: 2000 },
     type: { type: String, required: true, trim: true },
+    relatedType: { type: String, trim: true },
+    relatedId: { type: objectId },
+    dedupeKey: { type: String, trim: true },
     isRead: { type: Boolean, default: false, index: true },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
 NotificationSchema.index({ recipient: 1, createdAt: -1 });
+NotificationSchema.index({ dedupeKey: 1 }, { unique: true, sparse: true });
 export const Notification = models.Notification ?? model("Notification", NotificationSchema);
 
 const ImpactMetricSchema = new Schema(

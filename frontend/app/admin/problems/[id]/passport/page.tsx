@@ -1,0 +1,9 @@
+"use client";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ProtectedRoute } from "@/components/auth/protected-route";
+import { getChallengePassport } from "@/services/problem.service";
+import type { ChallengePassport } from "@/types/passport";
+function Content() { const params = useParams<{ id: string }>(); const id = Array.isArray(params.id) ? params.id[0] : params.id; const [data, setData] = useState<ChallengePassport | null>(null); const [error, setError] = useState(""); useEffect(() => { getChallengePassport(id).then(setData).catch(() => setError("Unable to load the Challenge Passport.")); }, [id]); if (error) return <main className="mx-auto max-w-5xl px-5 py-16"><p className="text-red-200" role="alert">{error}</p></main>; if (!data) return <main className="mx-auto max-w-5xl px-5 py-16"><p className="text-white/50">Loading Challenge Passport…</p></main>; return <main className="mx-auto max-w-5xl px-5 py-16"><Link href={`/admin/problems/${id}`} className="text-link">← Back to review</Link><p className="eyebrow mt-10">Admin Challenge Passport / {data.problem.status}</p><h1 className="display-md mt-3">{data.problem.title}</h1><section className="mt-10 border border-white/10 p-6"><p className="eyebrow">Timeline</p><ol className="mt-6 space-y-4">{data.events.map((event, index) => <li key={`${event.type}-${event.timestamp}-${index}`} className="border-l border-blue-300/40 pl-5"><p className="text-white">{event.title}</p><p className="mt-1 text-xs uppercase tracking-widest text-white/45">{event.status} · {new Date(event.timestamp).toLocaleString()}</p>{event.detail && <p className="mt-2 text-sm text-white/60">{event.detail}</p>}</li>)}</ol></section></main>; }
+export default function Page() { return <ProtectedRoute allowedRole="ADMIN"><Content /></ProtectedRoute>; }

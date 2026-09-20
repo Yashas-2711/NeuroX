@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Collaboration, Problem, Project, Solution, Team, University } from "../models";
 import { AppError } from "../utils/app-error";
+import { create as createNotification, notifyMany } from "./notification.service";
 
 type Actor = { userId: string; role: string };
 const oid = (value: string) => {
@@ -74,6 +75,8 @@ export async function create(actor: Actor, projectId: string, input: { title: st
   if (duplicate) throw new AppError("A solution with this title already exists for the project", 409);
   const problem = project.problem as any;
   const solution = await Solution.create({ ...input, project: project._id, problem: problem?._id ?? problem, submittedBy: oid(actor.userId), status: "SUBMITTED" });
+  const university = await University.findById(project.university).select("user");
+  if (university?.user && university.user.toString() !== actor.userId) await createNotification({ recipient: university.user.toString(), title: "New solution submitted", message: `A solution was submitted for “${project.title}”.`, type: "SOLUTION_SUBMITTED", relatedType: "SOLUTION", relatedId: solution._id, dedupeKey: `solution-submitted:${solution._id}` });
   return safe(solution, permissions.isOwner);
 }
 
@@ -109,6 +112,7 @@ export async function review(actor: Actor, solutionId: string, status: "APPROVED
   solution.reviewedBy = oid(actor.userId);
   solution.reviewedAt = new Date();
   await solution.save();
+  await createNotification({ recipient: solution.submittedBy.toString(), title: `Solution ${status.toLowerCase()}`, message: `Your solution “${solution.title}” was ${status.toLowerCase()}.`, type: `SOLUTION_${status}`, relatedType: "SOLUTION", relatedId: solution._id, dedupeKey: `solution-review:${solution._id}:${status}` });
   return safe(solution, true);
 }
 
@@ -125,6 +129,9 @@ export async function lifecycle(actor: Actor, solutionId: string, status: "PROTO
   solution.stageUpdatedBy = oid(actor.userId);
   solution.stageUpdatedAt = new Date();
   await solution.save();
+  const team = await Team.findOne({ project: project._id }).select("members");
+  const recipients = team?.members.map((member: any) => member.user.toString()) ?? [];
+  recipients.push(solution.submittedBy.toString());
+  await notifyMany(recipients, { title: "Solution lifecycle updated", message: `“${solution.title}” moved to ${status}.`, type: "SOLUTION_STAGE_CHANGED", relatedType: "SOLUTION", relatedId: solution._id, dedupeKey: `solution-stage:${solution._id}:${status}` });
   return safe(solution, true);
 }
-

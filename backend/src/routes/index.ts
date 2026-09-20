@@ -10,6 +10,7 @@ import studentRouter from "./student.routes";
 import industryRouter from "./industry.routes";
 import collaborationRouter from "./collaboration.routes";
 import { projectSolutionRouter, solutionRouter } from "./solution.routes";
+import notificationRouter from "./notification.routes";
 
 const apiRouter = Router();
 
@@ -32,5 +33,6 @@ apiRouter.use("/industry", industryRouter);
 apiRouter.use("/university/collaborations", collaborationRouter);
 apiRouter.use("/projects", projectSolutionRouter);
 apiRouter.use("/solutions", solutionRouter);
+apiRouter.use("/notifications", notificationRouter);
 
 export default apiRouter;
