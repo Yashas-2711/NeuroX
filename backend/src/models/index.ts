@@ -143,6 +143,40 @@ const ProblemDNASchema = new Schema(
 
 export const ProblemDNA = models.ProblemDNA ?? model("ProblemDNA", ProblemDNASchema);
 
+export const OPPORTUNITY_MATCH_ENTITY_TYPES = ["UNIVERSITY", "INDUSTRY"] as const;
+export const OPPORTUNITY_MATCH_STATUSES = ["CURRENT", "STALE", "FAILED"] as const;
+const OpportunityMatchSchema = new Schema(
+  {
+    problem: { type: objectId, ref: "Problem", required: true, index: true },
+    entityType: { type: String, enum: OPPORTUNITY_MATCH_ENTITY_TYPES, required: true, index: true },
+    university: { type: objectId, ref: "University", index: true },
+    industry: { type: objectId, ref: "Industry", index: true },
+    overallScore: { type: Number, min: 0, max: 100, required: true },
+    scoreBreakdown: {
+      semantic: { type: Number, min: 0, max: 100, required: true },
+      domain: { type: Number, min: 0, max: 100, required: true },
+      skills: { type: Number, min: 0, max: 100, required: true },
+      resource: { type: Number, min: 0, max: 100, required: true },
+      location: { type: Number, min: 0, max: 100, required: true },
+    },
+    weights: {
+      semantic: { type: Number, required: true }, domain: { type: Number, required: true }, skills: { type: Number, required: true }, resource: { type: Number, required: true }, location: { type: Number, required: true },
+    },
+    matchingReasons: { type: [String], default: [] },
+    matchedCapabilities: { type: [String], default: [] },
+    missingCapabilities: { type: [String], default: [] },
+    status: { type: String, enum: OPPORTUNITY_MATCH_STATUSES, default: "CURRENT", index: true },
+    sourceVersion: { type: String, default: "step16-v1" },
+    sourceUpdatedAt: { type: Date },
+    generatedAt: { type: Date, required: true },
+  },
+  { timestamps: true },
+);
+OpportunityMatchSchema.index({ problem: 1, entityType: 1, university: 1 }, { unique: true, partialFilterExpression: { entityType: "UNIVERSITY" } });
+OpportunityMatchSchema.index({ problem: 1, entityType: 1, industry: 1 }, { unique: true, partialFilterExpression: { entityType: "INDUSTRY" } });
+OpportunityMatchSchema.index({ entityType: 1, overallScore: -1, status: 1 });
+export const OpportunityMatch = models.OpportunityMatch ?? model("OpportunityMatch", OpportunityMatchSchema);
+
 const ContactSchema = new Schema(
   {
     name: { type: String, trim: true },
@@ -406,6 +440,7 @@ export const modelsRegistry = {
   User,
   Problem,
   ProblemDNA,
+  OpportunityMatch,
   University,
   UniversityInterest,
   Industry,

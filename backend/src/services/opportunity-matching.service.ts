@@ -38,14 +38,21 @@ export async function calculateOpportunityMatch(problem: any, profile: any, kind
   if (!domain) missingCapabilities.push("A directly matching domain is not listed in the profile");
   if (!skill) missingCapabilities.push("Required skills are not listed in the profile");
   if (!resource) missingCapabilities.push("Required resources or facilities are not listed in the profile");
+  const matchedCapabilities = [...new Set([
+    ...(domain ? domains.filter((value: string) => tokens(requiredDomains).has(value.toLowerCase())) : []),
+    ...(skill ? skills.filter((value: string) => tokens(requiredSkills).has(value.toLowerCase())) : []),
+    ...(resource ? resources.filter((value: string) => tokens(requiredResources).has(value.toLowerCase())) : []),
+  ])];
+  const overallMatchScore = semantic * OPPORTUNITY_MATCH_WEIGHTS.semantic + domain * OPPORTUNITY_MATCH_WEIGHTS.domain + skill * OPPORTUNITY_MATCH_WEIGHTS.skills + resource * OPPORTUNITY_MATCH_WEIGHTS.resource + location * OPPORTUNITY_MATCH_WEIGHTS.location;
   return {
-    overallMatchScore: semantic * OPPORTUNITY_MATCH_WEIGHTS.semantic + domain * OPPORTUNITY_MATCH_WEIGHTS.domain + skill * OPPORTUNITY_MATCH_WEIGHTS.skills + resource * OPPORTUNITY_MATCH_WEIGHTS.resource + location * OPPORTUNITY_MATCH_WEIGHTS.location,
+    overallMatchScore: Math.max(0, Math.min(1, overallMatchScore)),
     semanticScore: semantic,
     domainScore: domain,
     skillsScore: skill,
     resourceScore: resource,
     locationScore: location,
     matchingReasons: reasons,
+    matchedCapabilities,
     missingCapabilities,
     scoringWeights: OPPORTUNITY_MATCH_WEIGHTS,
   };

@@ -1,0 +1,6 @@
+import { apiClient } from "@/lib/api";
+import type { OpportunityEntityType, OpportunityMatchPage, PersistedOpportunityMatch } from "@/types/opportunity-match";
+export async function getProblemOpportunityMatches(problemId: string, params: { entityType?: OpportunityEntityType; minScore?: number; page?: number; limit?: number; sort?: "score" | "newest" } = {}) { const response = await apiClient.get<{ data: OpportunityMatchPage }>(`/problems/${problemId}/opportunities`, { params }); return response.data.data; }
+export async function generateProblemOpportunityMatches(problemId: string, entityType?: OpportunityEntityType) { const response = await apiClient.post<{ data: { matches: PersistedOpportunityMatch[] } }>(`/problems/${problemId}/opportunities/generate`, entityType ? { entityType } : {}); return response.data.data.matches; }
+export async function refreshProblemOpportunityMatches(problemId: string) { const response = await apiClient.post<{ data: { matches: PersistedOpportunityMatch[] } }>(`/problems/${problemId}/opportunities/refresh`); return response.data.data.matches; }
+export async function getProblemOpportunityMatch(problemId: string, matchId: string) { const response = await apiClient.get<{ data: { match: PersistedOpportunityMatch } }>(`/problems/${problemId}/opportunities/${matchId}`); return response.data.data.match; }

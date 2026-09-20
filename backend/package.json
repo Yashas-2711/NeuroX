@@ -11,7 +11,8 @@
     "type-check": "tsc --noEmit",
     "check": "npm run type-check",
     "test:step14": "tsx scripts/step14-runtime.ts",
-    "test:step15": "tsx scripts/step15-runtime.ts"
+    "test:step15": "tsx scripts/step15-runtime.ts",
+    "test:step16": "tsx scripts/step16-runtime.ts"
   },
   "keywords": [],
   "type": "commonjs",
