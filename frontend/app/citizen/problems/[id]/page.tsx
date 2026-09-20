@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { getProblem, getProblemProgress } from "@/services/problem.service";
 import { ProblemProgressTracker } from "@/components/problems/problem-progress";
+import { ProblemDNASection } from "@/components/problems/problem-dna";
 import type { Problem } from "@/types/problem";
 import type { ProblemProgress } from "@/types/problem";
 function Content() {
@@ -100,6 +101,7 @@ function Content() {
                 </div>
               </section>
             )}
+            <ProblemDNASection problemId={id} />
             {item.aiAnalysis?.status === "FAILED" && (
               <p className="mt-10 border border-amber-300/20 p-5 text-sm text-white/60">
                 Automated analysis is temporarily unavailable. Your problem was

@@ -26,6 +26,7 @@ export async function createProblem(input: CreateProblemInput, userId: string) {
     const reason = error instanceof AIServiceError ? error.message : "unexpected AI integration error";
     console.warn(`AI analysis failed for problem ${problem._id.toString()}: ${reason}`);
     problem.aiAnalysisStatus = "FAILED";
+    problem.aiAnalysisFailedAt = new Date();
     await problem.save();
   }
   return safe(problem);

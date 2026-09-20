@@ -94,6 +94,7 @@ const ProblemSchema = new Schema(
     embedding: { type: [Number], default: undefined },
     aiAnalysisStatus: { type: String, enum: ["PENDING", "COMPLETED", "FAILED"], default: "PENDING", index: true },
     aiAnalyzedAt: { type: Date },
+    aiAnalysisFailedAt: { type: Date },
     similarProblems: [{ type: objectId, ref: "Problem" }],
     priority: { type: String, enum: PROBLEM_PRIORITIES, default: "MEDIUM" },
     status: { type: String, enum: PROBLEM_STATUSES, default: "SUBMITTED", index: true },
@@ -109,6 +110,38 @@ const ProblemSchema = new Schema(
 
 ProblemSchema.index({ createdAt: -1 });
 export const Problem = models.Problem ?? model("Problem", ProblemSchema);
+
+export const DNA_GENERATION_STATUSES = ["PENDING", "GENERATING", "COMPLETED", "FAILED"] as const;
+export type DnaGenerationStatus = (typeof DNA_GENERATION_STATUSES)[number];
+
+const ProblemDNASchema = new Schema(
+  {
+    problem: { type: objectId, ref: "Problem", required: true, unique: true, index: true },
+    category: { type: String, trim: true, required: true },
+    subcategory: { type: String, trim: true, default: null },
+    rootCauses: { type: [String], default: [] },
+    affectedPopulation: { type: String, trim: true, default: null },
+    geographicContext: {
+      city: { type: String, trim: true },
+      state: { type: String, trim: true },
+      country: { type: String, trim: true },
+    },
+    severityLevel: { type: String, trim: true, required: true },
+    urgencyLevel: { type: String, trim: true, required: true },
+    resourceRequirements: { type: [String], default: [] },
+    requiredSkills: { type: [String], default: [] },
+    sustainabilityRelevance: { type: String, trim: true, default: null },
+    dnaSummary: { type: String, required: true, trim: true, maxlength: 3000 },
+    confidence: { type: Number, min: 0, max: 1, required: true },
+    generatedAt: { type: Date },
+    updatedAt: { type: Date },
+    generationStatus: { type: String, enum: DNA_GENERATION_STATUSES, default: "PENDING", index: true },
+    failureReason: { type: String, trim: true, maxlength: 500 },
+  },
+  { timestamps: true },
+);
+
+export const ProblemDNA = models.ProblemDNA ?? model("ProblemDNA", ProblemDNASchema);
 
 const ContactSchema = new Schema(
   {
@@ -372,6 +405,7 @@ export const ImpactMetric = models.ImpactMetric ?? model("ImpactMetric", ImpactM
 export const modelsRegistry = {
   User,
   Problem,
+  ProblemDNA,
   University,
   UniversityInterest,
   Industry,

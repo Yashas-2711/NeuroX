@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from engine.models import engine
 from engine.similarity import find_similar_problems
-from schemas import AnalysisRequest, SimilarityRequest, TextRequest
+from schemas import AnalysisRequest, DNARequest, SimilarityRequest, TextRequest
 
 load_dotenv()
 
@@ -75,6 +75,33 @@ def analysis(request: AnalysisRequest):
         if request.existing_embeddings:
             result["similarity"] = find_similar_problems(vector, [item.model_dump() for item in request.existing_embeddings])
         return result
+    except (ValueError, RuntimeError) as error:
+        raise api_error(error) from error
+
+@app.post("/dna")
+@app.post("/api/dna")
+def dna(request: DNARequest):
+    try:
+        text = f"{request.title.strip()}\n{request.description.strip()}"
+        classification = engine.classify(text)
+        location = {key: value for key, value in request.location.items() if value}
+        priority = request.priority.strip().upper()
+        summary = f"Structured profile for the {request.category} problem '{request.title.strip()}'."
+        return {
+            "category": request.category,
+            "subcategory": None,
+            "root_causes": [],
+            "affected_population": None,
+            "geographic_context": location,
+            "severity_level": priority,
+            "urgency_level": priority,
+            "resource_requirements": [],
+            "required_skills": [],
+            "sustainability_relevance": None,
+            "dna_summary": summary,
+            "confidence": classification["confidence"],
+            "data_sources": ["problem submission", "local BERT-Tiny classification"],
+        }
     except (ValueError, RuntimeError) as error:
         raise api_error(error) from error
 

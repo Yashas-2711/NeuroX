@@ -90,6 +90,15 @@ export function SiteHeader() {
 
 function NotificationLink() {
   const [count, setCount] = useState(0);
-  useEffect(() => { getUnreadNotificationCount().then(setCount).catch(() => undefined); }, []);
+  useEffect(() => {
+    const load = () => { void getUnreadNotificationCount().then(setCount).catch(() => undefined); };
+    load();
+    window.addEventListener("neurox:notifications-changed", load);
+    window.addEventListener("focus", load);
+    return () => {
+      window.removeEventListener("neurox:notifications-changed", load);
+      window.removeEventListener("focus", load);
+    };
+  }, []);
   return <Link href="/notifications" className="icon-button relative" aria-label={count ? `${count} unread notifications` : "Notifications"}><Bell size={17} />{count > 0 && <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-blue-400 px-1 text-center text-[10px] text-black">{count > 9 ? "9+" : count}</span>}</Link>;
 }

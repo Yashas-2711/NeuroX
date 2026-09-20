@@ -13,16 +13,21 @@ export type NotificationInput = {
 };
 
 export async function create(input: NotificationInput) {
-  const document = {
-    ...input,
-    recipient: new Types.ObjectId(input.recipient.toString()),
-    relatedId: input.relatedId ? new Types.ObjectId(input.relatedId.toString()) : undefined,
-  };
-  if (input.dedupeKey) {
-    await Notification.updateOne({ dedupeKey: input.dedupeKey }, { $setOnInsert: document }, { upsert: true });
-    return Notification.findOne({ dedupeKey: input.dedupeKey });
+  try {
+    const document = {
+      ...input,
+      recipient: new Types.ObjectId(input.recipient.toString()),
+      relatedId: input.relatedId ? new Types.ObjectId(input.relatedId.toString()) : undefined,
+    };
+    if (input.dedupeKey) {
+      await Notification.updateOne({ dedupeKey: input.dedupeKey }, { $setOnInsert: document }, { upsert: true });
+      return Notification.findOne({ dedupeKey: input.dedupeKey });
+    }
+    return Notification.create(document);
+  } catch (error) {
+    console.warn(`Notification delivery failed: ${error instanceof Error ? error.message : "unknown error"}`);
+    return null;
   }
-  return Notification.create(document);
 }
 
 export async function notifyMany(recipients: string[], input: Omit<NotificationInput, "recipient">) {
