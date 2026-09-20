@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { requireAuth, requireRole } from "../middleware/auth";
+import { asyncHandler } from "../middleware/asyncHandler";
+import * as controller from "../controllers/collaboration.controller";
+const router = Router();
+router.use(requireAuth, requireRole("UNIVERSITY"));
+router.get("/", asyncHandler(controller.list));
+router.patch("/:id/accept", asyncHandler(controller.accept));
+router.patch("/:id/reject", asyncHandler(controller.reject));
+export default router;

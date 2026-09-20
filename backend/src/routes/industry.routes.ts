@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { requireAuth, requireRole } from "../middleware/auth";
+import { asyncHandler } from "../middleware/asyncHandler";
+import * as controller from "../controllers/industry.controller";
+const router = Router();
+router.use(requireAuth, requireRole("INDUSTRY"));
+router.get("/profile", asyncHandler(controller.profile));
+router.patch("/profile", asyncHandler(controller.updateProfile));
+router.get("/opportunities", asyncHandler(controller.opportunities));
+router.get("/opportunities/:id", asyncHandler(controller.opportunity));
+router.post("/projects/:id/interest", asyncHandler(controller.interest));
+router.get("/collaborations", asyncHandler(controller.collaborations));
+router.get("/projects/:id", asyncHandler(controller.project));
+export default router;

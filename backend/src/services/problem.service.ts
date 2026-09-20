@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Milestone, Problem, Project, Team, UniversityInterest } from "../models";
+import { Milestone, Problem, Project, Solution, Team, UniversityInterest } from "../models";
 import { AppError } from "../middleware/errorHandler";
 import type { CreateProblemInput } from "../validators/problem.validators";
 import { AIServiceError, analyzeProblem } from "./ai/aiClient";
@@ -56,11 +56,12 @@ async function buildProblemProgress(id: string, userId?: string) {
     Project.find({ problem: problem._id }).populate("university", "name profileLocation").sort({ createdAt: -1 }),
   ]);
   const projectSummaries = await Promise.all(projects.map(async (project) => {
-    const [team, stats] = await Promise.all([
+    const [team, solutions, stats] = await Promise.all([
       Team.findOne({ project: project._id }).populate("leader", "name email role").populate("members.user", "name email role"),
+      Solution.find({ project: project._id }).select("title status createdAt updatedAt").sort({ createdAt: -1 }),
       projectProgress(project._id),
     ]);
-    return { id: project._id.toString(), title: project.title, description: project.description, status: project.status, university: project.university, startDate: project.startDate, targetEndDate: project.targetEndDate, team, ...stats };
+    return { id: project._id.toString(), title: project.title, description: project.description, status: project.status, university: project.university, startDate: project.startDate, targetEndDate: project.targetEndDate, team, solutions: solutions.map((solution: any) => ({ id: solution._id.toString(), title: solution.title, status: solution.status, createdAt: solution.createdAt, updatedAt: solution.updatedAt })), ...stats };
   }));
   return {
     problem: { id: problem._id.toString(), title: problem.title, status: problem.status, category: problem.category, location: problem.location, aiAnalysisStatus: problem.aiAnalysisStatus, createdAt: problem.createdAt, updatedAt: problem.updatedAt },

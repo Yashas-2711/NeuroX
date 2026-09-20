@@ -6,7 +6,7 @@ NeuroX is a local-AI-powered platform for collecting societal problems, validati
 
 ## Current implementation status
 
-Steps 1–11 are implemented:
+Steps 1–12 are implemented:
 
 - Project setup, frontend, backend, MongoDB models, and security foundation
 - JWT authentication and role-based access control
@@ -18,15 +18,16 @@ Steps 1–11 are implemented:
 - University interest and project creation
 - University teams, Student members, milestones, status transitions, and progress calculation
 - Student multi-team workspace and read-only problem/project progress tracking
+- Industry profiles, local AI opportunity discovery, collaboration requests, and university accept/reject workflow
 
-Step 12, Industry Collaboration, is not implemented.
+Step 13, Solution Management, is not implemented.
 
 ## Roles
 
 - **Citizen:** Submit problems and track the progress of owned submissions.
 - **Student:** Submit problems, view owned problem progress, and participate in multiple university project teams.
 - **University:** Maintain an institution profile, discover validated problems, express interest, create projects, manage teams, and manage milestones for owned projects.
-- **Industry:** Role foundation exists; Industry Collaboration is deferred.
+- **Industry:** Maintain an organization profile, discover matched opportunities, express interest, and view accepted project participation.
 - **Admin:** Review, validate, or reject submitted problems.
 
 ## Architecture
@@ -62,6 +63,7 @@ Frontend:
 - `/citizen`, `/citizen/problems`, `/citizen/problems/new`
 - `/student`, `/student/teams`
 - `/university`, `/university/profile`, `/university/problems`, `/university/projects`
+- `/industry`, `/industry/profile`, `/industry/opportunities`, `/industry/collaborations`
 - `/admin`, `/admin/problems/[id]`
 
 Backend API groups:

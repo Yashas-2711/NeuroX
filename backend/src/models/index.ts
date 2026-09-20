@@ -182,12 +182,23 @@ export const UniversityInterest = models.UniversityInterest ?? model("University
 
 const IndustrySchema = new Schema(
   {
+    user: { type: objectId, ref: "User", required: true, unique: true, index: true },
     name: { type: String, required: true, trim: true, maxlength: 200 },
     description: { type: String, trim: true, maxlength: 5000 },
-    industryType: { type: String, required: true, trim: true, index: true },
+    industryType: { type: String, trim: true, index: true },
     location: { type: objectId },
     expertise: { type: [String], default: [], index: true },
     capabilities: { type: [String], default: [] },
+    technologies: { type: [String], default: [] },
+    skills: { type: [String], default: [] },
+    resources: { type: [String], default: [] },
+    facilities: { type: [String], default: [] },
+    collaborationInterests: { type: [String], default: [] },
+    profileLocation: {
+      city: { type: String, trim: true, maxlength: 120 },
+      state: { type: String, trim: true, maxlength: 120 },
+      country: { type: String, trim: true, maxlength: 120 },
+    },
     contact: { type: ContactSchema },
     isActive: { type: Boolean, default: true, index: true },
   },
@@ -284,27 +295,45 @@ const SolutionSchema = new Schema(
     title: { type: String, required: true, trim: true, maxlength: 200 },
     description: { type: String, required: true, trim: true, maxlength: 10000 },
     approach: { type: String, trim: true, maxlength: 10000 },
+    expectedOutcome: { type: String, trim: true, maxlength: 5000 },
+    requiredResources: { type: [String], default: [] },
     documents: { type: [String], default: [] },
     submittedBy: { type: objectId, ref: "User", required: true, index: true },
-    status: { type: String, enum: ["DRAFT", "SUBMITTED", "ACCEPTED", "ARCHIVED"], default: "DRAFT" },
+    status: { type: String, enum: ["DRAFT", "SUBMITTED", "REJECTED", "APPROVED", "ACCEPTED", "PROTOTYPE", "TESTING", "IMPLEMENTATION", "COMPLETED", "ARCHIVED"], default: "DRAFT", index: true },
+    reviewNotes: { type: String, trim: true, maxlength: 5000 },
+    reviewedBy: { type: objectId, ref: "User" },
+    reviewedAt: { type: Date },
+    lifecycleNotes: { type: String, trim: true, maxlength: 5000 },
+    stageUpdatedBy: { type: objectId, ref: "User" },
+    stageUpdatedAt: { type: Date },
   },
   { timestamps: true },
 );
 
+SolutionSchema.index({ project: 1, status: 1 });
+SolutionSchema.index({ problem: 1, status: 1 });
 export const Solution = models.Solution ?? model("Solution", SolutionSchema);
 
 export const COLLABORATION_TYPES = ["MENTORING", "FUNDING", "PROTOTYPING", "IMPLEMENTATION", "RESOURCE_SUPPORT"] as const;
+export const COLLABORATION_STATUSES = ["PENDING", "ACCEPTED", "REJECTED"] as const;
 
 const CollaborationSchema = new Schema(
   {
     project: { type: objectId, ref: "Project", required: true, index: true },
     industry: { type: objectId, ref: "Industry", required: true, index: true },
-    type: { type: String, enum: COLLABORATION_TYPES, required: true },
+    requestedBy: { type: objectId, ref: "User", required: true },
+    type: { type: String, enum: COLLABORATION_TYPES, default: "RESOURCE_SUPPORT" },
     message: { type: String, required: true, trim: true, maxlength: 5000 },
-    status: { type: String, enum: ["PROPOSED", "ACTIVE", "COMPLETED", "DECLINED"], default: "PROPOSED" },
+    status: { type: String, enum: COLLABORATION_STATUSES, default: "PENDING", index: true },
+    respondedAt: { type: Date },
+    respondedBy: { type: objectId, ref: "User" },
   },
   { timestamps: true },
 );
+
+CollaborationSchema.index({ project: 1, industry: 1 }, { unique: true });
+CollaborationSchema.index({ industry: 1, status: 1 });
+CollaborationSchema.index({ project: 1, status: 1 });
 
 export const Collaboration = models.Collaboration ?? model("Collaboration", CollaborationSchema);
 
