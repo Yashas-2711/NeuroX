@@ -30,6 +30,13 @@ app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
+// Authenticated API responses contain mutable project, collaboration, and solution data.
+// Prevent browser/proxy 304 caching from hiding newly accepted requests or submitted solutions.
+app.use("/api", (_request, response, next) => {
+  response.setHeader("Cache-Control", "no-store");
+  next();
+});
+
 app.use("/api", apiRouter);
 app.use(notFound);
 app.use(errorHandler);
