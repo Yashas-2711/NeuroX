@@ -1,7 +1,7 @@
 import { apiClient } from "@/lib/api";
 import type { Collaboration, IndustryOpportunity, IndustryProfile, IndustryProjectView } from "@/types/industry";
 export async function getIndustryProfile(){const r=await apiClient.get<{data:{profile:IndustryProfile|null}}>("/industry/profile");return r.data.data.profile}
-export async function updateIndustryProfile(input:IndustryProfile){const r=await apiClient.patch<{data:{profile:IndustryProfile}}>("/industry/profile",input);return r.data.data.profile}
+export async function updateIndustryProfile(input:IndustryProfile){const payload={organizationName:input.organizationName,description:input.description,industryType:input.industryType,location:input.location,domains:input.domains,expertise:input.expertise,technologies:input.technologies,skills:input.skills,resources:input.resources,facilities:input.facilities,collaborationInterests:input.collaborationInterests};const r=await apiClient.patch<{data:{profile:IndustryProfile}}>("/industry/profile",payload);return r.data.data.profile}
 export async function getIndustryOpportunities(params:Record<string,string|number>={}){const r=await apiClient.get<{data:{opportunities:IndustryOpportunity[];pagination:unknown}}>("/industry/opportunities",{params});return r.data.data}
 export async function getIndustryOpportunity(id:string){const r=await apiClient.get<{data:{opportunity:IndustryOpportunity}}>(`/industry/opportunities/${id}`);return r.data.data.opportunity}
 export async function expressIndustryInterest(projectId:string,message:string){const r=await apiClient.post<{data:{collaboration:Collaboration;project:unknown}}>(`/industry/projects/${projectId}/interest`,{message});return r.data.data}

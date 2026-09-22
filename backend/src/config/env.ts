@@ -17,6 +17,7 @@ export const env = {
   clientUrl: process.env.CLIENT_URL ?? "http://localhost:3000",
   aiServiceUrl: process.env.AI_SERVICE_URL ?? "",
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 30000),
+  apiRateLimitMax: Number(process.env.API_RATE_LIMIT_MAX ?? (nodeEnvironment === "production" ? 100 : 300)),
   jwtSecret: process.env.JWT_SECRET ?? "",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "7d",
 } as const;
@@ -29,6 +30,9 @@ export function validateEnvironment(options: { requireDatabase?: boolean } = {})
   }
   if (!Number.isInteger(env.aiRequestTimeoutMs) || env.aiRequestTimeoutMs <= 0) {
     throw new Error("AI_REQUEST_TIMEOUT_MS must be a positive integer");
+  }
+  if (!Number.isInteger(env.apiRateLimitMax) || env.apiRateLimitMax <= 0) {
+    throw new Error("API_RATE_LIMIT_MAX must be a positive integer");
   }
 
   if (!env.clientUrl) missing.push("CLIENT_URL");

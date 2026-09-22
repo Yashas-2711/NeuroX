@@ -27,7 +27,7 @@ cd "P:\NeuroX — Societal Innovation Collaboration Platform\frontend"
 npm.cmd run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. For a local demo, you may set `API_RATE_LIMIT_MAX=300` in `backend/.env` to avoid the global development limiter interrupting rapid navigation.
 
 ## Accounts and safety
 

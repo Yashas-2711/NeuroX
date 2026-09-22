@@ -21,6 +21,8 @@ Real `.env` files are local-only and ignored. Templates contain placeholders onl
 
 This is a defensive application review, not a penetration test or security certification. Dependency audit results require working npm registry access. Runtime MongoDB and AI verification must be rerun whenever the local services or environment change.
 
+The API request limit is configurable through `API_RATE_LIMIT_MAX`; development defaults to 300 requests per 15 minutes and production defaults to 100. Review this value for the deployment environment rather than copying the demo setting blindly.
+
 ## Responsible testing
 
 Use an isolated test database and non-production accounts. Do not run destructive database commands or attempt attacks against external systems.
