@@ -14,6 +14,7 @@ import notificationRouter from "./notification.routes";
 import impactRouter from "./impact.routes";
 import revivalRouter from "./revival.routes";
 import communicationRouter from "./communication.routes";
+import analyticsRouter from "./analytics.routes";
 
 const apiRouter = Router();
 
@@ -31,6 +32,7 @@ apiRouter.use("/problems", problemRouter);
 apiRouter.use("/problems", impactRouter);
 apiRouter.use("/revival", revivalRouter);
 apiRouter.use("/projects", communicationRouter);
+apiRouter.use("/analytics", analyticsRouter);
 apiRouter.use("/admin/problems", adminProblemRouter);
 apiRouter.use("/university", universityRouter);
 apiRouter.use("/university/projects", projectRouter);
