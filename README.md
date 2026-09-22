@@ -1,207 +1,90 @@
 # NeuroX — Societal Innovation Collaboration Platform
 
-**Problem Statement ID:** 26043
+**SIH Problem Statement:** 26043
 
-NeuroX is a local-AI-powered platform for collecting societal problems, validating them, matching them with universities, and managing university-led innovation projects.
+NeuroX is a local-AI-powered platform for collecting societal challenges, validating them, matching them with universities and industries, and managing innovation projects and impact evidence.
 
-## Current implementation status
+## Current status
 
-Steps 1–12 are implemented:
+Steps 1–20 are implemented and Step 22 final testing, security, and documentation checks passed. Step 21 is the live SIH demo and end-to-end integration milestone.
 
-- Project setup, frontend, backend, MongoDB models, and security foundation
-- JWT authentication and role-based access control
-- Citizen and Student problem submission
-- Local BERT-Tiny classification and MiniLM embeddings
-- Node/Express ↔ FastAPI AI integration
-- Admin validation portal
-- University profiles, validated problem discovery, and AI Opportunity Matching
-- University interest and project creation
-- University teams, Student members, milestones, status transitions, and progress calculation
-- Student multi-team workspace and read-only problem/project progress tracking
-- Industry profiles, local AI opportunity discovery, collaboration requests, and university accept/reject workflow
+Implemented capabilities include authentication/RBAC, Citizen and Student submission, local BERT-Tiny classification, MiniLM embeddings, Admin validation, Problem DNA, Challenge Passport, notifications, University and Industry matching, projects, teams, milestones, solutions, Impact Twin, Dead Problem Revival, communication, and role-scoped analytics.
 
-Step 13, Solution Management, is not implemented.
-
-## Roles
-
-- **Citizen:** Submit problems and track the progress of owned submissions.
-- **Student:** Submit problems, view owned problem progress, and participate in multiple university project teams.
-- **University:** Maintain an institution profile, discover validated problems, express interest, create projects, manage teams, and manage milestones for owned projects.
-- **Industry:** Maintain an organization profile, discover matched opportunities, express interest, and view accepted project participation.
-- **Admin:** Review, validate, or reject submitted problems.
+AI inference remains local. No OpenAI, Gemini, Claude, Groq, OpenRouter, or hosted inference APIs are used.
 
 ## Architecture
 
 ```text
-frontend/  Next.js + React + TypeScript + Tailwind CSS
+frontend/  Next.js + React + TypeScript + Tailwind + shadcn/ui
 backend/   Node.js + Express + TypeScript + MongoDB/Mongoose
 ai/        Python + FastAPI + local BERT-Tiny + MiniLM
-docs/      Workflow and architecture documentation
 ```
 
 ```text
-Citizen/Student problem
-        ↓
-Local BERT-Tiny + MiniLM analysis
-        ↓
-Admin validation
-        ↓
-University Opportunity Match
-        ↓
-University interest
-        ↓
-Project → Team → Milestones → Progress
+Challenge → Local AI → Admin validation → Matching → Collaboration
+          → Project → Team → Milestones → Solutions → Impact evidence
 ```
 
-AI inference remains local. The platform does not use OpenAI, Gemini, Claude, Groq, OpenRouter, or another hosted inference API.
+## Main routes
 
-## Important routes
+- Citizen: `/citizen`, `/citizen/problems`, `/citizen/problems/new`
+- Student: `/student`, `/student/teams`
+- University: `/university`, `/university/profile`, `/university/problems`, `/university/projects`
+- Industry: `/industry`, `/industry/profile`, `/industry/opportunities`, `/industry/collaborations`
+- Admin: `/admin`, `/admin/analytics`, `/admin/revival`
+- Shared: `/login`, `/register`, `/notifications`
 
-Frontend:
-
-- `/login`, `/register`
-- `/citizen`, `/citizen/problems`, `/citizen/problems/new`
-- `/student`, `/student/teams`
-- `/university`, `/university/profile`, `/university/problems`, `/university/projects`
-- `/industry`, `/industry/profile`, `/industry/opportunities`, `/industry/collaborations`
-- `/admin`, `/admin/problems/[id]`
-
-Backend API groups:
-
-- `/api/auth`
-- `/api/problems`
-- `/api/admin/problems`
-- `/api/university`
-- `/api/university/projects`
-- `/api/student/teams`
-
-AI service:
-
-- `GET /health`
-- `POST /classify`
-- `POST /embed`
-- `POST /similar`
-- `POST /analysis`
+Backend groups include `/api/auth`, `/api/problems`, `/api/admin/problems`, `/api/university`, `/api/university/projects`, `/api/industry`, `/api/student/teams`, `/api/notifications`, `/api/analytics`, `/api/revival`, and `/api/projects/:id/messages`.
 
 ## Quick start
 
-Prerequisites:
-
-- Node.js 22+
-- Python 3.13+
-- MongoDB connection configured in `backend/.env`
-
-Install JavaScript dependencies:
-
-```powershell
-cd backend
-npm install
-
-cd ..\frontend
-npm install
-```
-
-Start the backend in one terminal:
-
-```powershell
-cd "P:\NeuroX — Societal Innovation Collaboration Platform\backend"
-npm run dev
-```
-
-Start the frontend in a second terminal:
-
-```powershell
-cd "P:\NeuroX — Societal Innovation Collaboration Platform\frontend"
-npm run dev
-```
-
-Start the local AI service in a third terminal:
+Prerequisites: Node.js 22+, Python 3.13+, and MongoDB configured in `backend/.env`. Keep real secrets in ignored `.env` files only.
 
 ```powershell
 cd "P:\NeuroX — Societal Innovation Collaboration Platform\ai"
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 & ".\.venv\Scripts\Activate.ps1"
 python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-Open the web application at `http://localhost:3000`.
+```powershell
+cd "P:\NeuroX — Societal Innovation Collaboration Platform\backend"
+npm.cmd run dev
+```
 
-The backend runs on `http://localhost:5000` and the AI service runs on `http://127.0.0.1:8000`.
+```powershell
+cd "P:\NeuroX — Societal Innovation Collaboration Platform\frontend"
+npm.cmd run dev
+```
 
-## Step 11 test flow
+Open `http://localhost:3000`. See [docs/SIH_DEMO_GUIDE.md](docs/SIH_DEMO_GUIDE.md) for the live sequence.
 
-1. Register a Student and a University user.
-2. Complete the University profile.
-3. Validate a submitted problem from `/admin`.
-4. Express interest as the University.
-5. Open the created project.
-6. Create a project team and add the Student.
-7. Open `/student/teams` and verify the team appears.
-8. Add and complete milestones from the University project workspace.
-9. Verify project progress updates.
-10. Open the original problem as its submitter and verify lifecycle/project progress.
-11. Verify Students cannot edit projects, teams, or milestones.
-12. Verify another user cannot view the problem owner's private progress.
-
-## Verification commands
-
-Backend:
+## Verification
 
 ```powershell
 cd backend
-npm run type-check
-npm run build
-```
+npm.cmd run type-check
+npm.cmd run build
+npm.cmd run test:step14
+npm.cmd run test:step15
+npm.cmd run test:step16
+npm.cmd run test:step17
+npm.cmd run test:step18
+npm.cmd run test:step19
+npm.cmd run test:step20
 
-Frontend:
+cd ..\frontend
+npm.cmd run lint
+npm.cmd run type-check
+npm.cmd run build
 
-```powershell
-cd frontend
-npm run lint
-npm run type-check
-npm run build
-```
-
-AI tests:
-
-```powershell
-cd ai
+cd ..\ai
 & ".\.venv\Scripts\python.exe" -m unittest discover -s tests -v
 ```
 
-Git safety check:
-
-```powershell
-git diff --check
-git status --short
-```
-
-## Security
-
-- Secrets belong only in ignored `.env` files.
-- Passwords are stored as bcrypt hashes.
-- JWTs and password hashes are excluded from API responses.
-- Protected endpoints use the existing JWT and RBAC middleware.
-- Ownership checks are enforced on private problems and university projects.
-- Student team data is read-only from the Student workspace.
-- No external AI inference APIs or hardcoded credentials are used.
+Runtime scripts use isolated timestamped databases and print `STEP*_RUNTIME_PASS` when successful.
 
 ## Documentation
 
-Useful workflow documentation is available in `docs/`, including:
+See [Architecture](docs/ARCHITECTURE.md), [API documentation](docs/API_DOCUMENTATION.md), [Security](docs/SECURITY.md), [Testing](docs/TESTING.md), and [SIH demo guide](docs/SIH_DEMO_GUIDE.md).
 
-- `docs/AI_ENGINE.md`
-- `docs/AI_BACKEND_INTEGRATION.md`
-- `docs/ADMIN_VALIDATION.md`
-- `docs/UNIVERSITY_MATCHING.md`
-- `docs/TEAM_PROJECT_MANAGEMENT.md`
-
-## Step 22 verification note
-
-Steps 1–20 are implemented. Step 22 is the final testing, security, and documentation review. Step 21 demo integration has not been started. The latest static checks completed successfully; AI runtime checks and npm dependency audits remain environment-dependent when the local Python launcher or npm registry is unavailable.
-
-See `docs/ARCHITECTURE.md`, `docs/API_DOCUMENTATION.md`, `docs/SECURITY.md`, and `docs/TESTING.md` for the verified architecture, security controls, API conventions, and Windows test commands.
-
-## License and attribution
-
-Developed for **Problem Statement ID 26043** — NeuroX Societal Innovation Collaboration Platform.
+Step 21 is limited to demo integration. No later roadmap step is included.
