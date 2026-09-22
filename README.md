@@ -196,6 +196,12 @@ Useful workflow documentation is available in `docs/`, including:
 - `docs/UNIVERSITY_MATCHING.md`
 - `docs/TEAM_PROJECT_MANAGEMENT.md`
 
+## Step 22 verification note
+
+Steps 1–20 are implemented. Step 22 is the final testing, security, and documentation review. Step 21 demo integration has not been started. The latest static checks completed successfully; AI runtime checks and npm dependency audits remain environment-dependent when the local Python launcher or npm registry is unavailable.
+
+See `docs/ARCHITECTURE.md`, `docs/API_DOCUMENTATION.md`, `docs/SECURITY.md`, and `docs/TESTING.md` for the verified architecture, security controls, API conventions, and Windows test commands.
+
 ## License and attribution
 
 Developed for **Problem Statement ID 26043** — NeuroX Societal Innovation Collaboration Platform.
