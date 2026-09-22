@@ -24,7 +24,9 @@ async function safeTeam(team: any) {
     .populate("problem", "title description category location status")
     .populate("university", "name profileLocation")
     .select("title description problem university status startDate targetEndDate createdAt updatedAt");
-  if (!project) throw new AppError("Project not found", 404);
+  // A stale team reference should not make the student's entire team list
+  // fail. Direct team-detail requests still return 404 through getTeam().
+  if (!project) return null;
   const [leader, members, stats] = await Promise.all([
     team.populate("leader", "name email role"),
     team.populate("members.user", "name email role"),
@@ -41,11 +43,14 @@ async function safeTeam(team: any) {
 
 export async function listTeams(userId: string) {
   const teams = await Team.find({ "members.user": oid(userId) }).sort({ updatedAt: -1 });
-  return Promise.all(teams.map(safeTeam));
+  const resolvedTeams = await Promise.all(teams.map(safeTeam));
+  return resolvedTeams.filter((team) => team !== null);
 }
 
 export async function getTeam(userId: string, teamId: string) {
   const team = await Team.findOne({ _id: oid(teamId), "members.user": oid(userId) });
   if (!team) throw new AppError("Team not found", 404);
-  return safeTeam(team);
+  const resolvedTeam = await safeTeam(team);
+  if (!resolvedTeam) throw new AppError("Team not found", 404);
+  return resolvedTeam;
 }

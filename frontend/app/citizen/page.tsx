@@ -30,6 +30,9 @@ function Dashboard() {
       >
         Submit a problem
       </Link>
+      <Link href="/citizen/analytics" className="button-secondary ml-3 mt-8 inline-flex">
+        View my analytics
+      </Link>
       <div className="mt-16 flex items-end justify-between">
         <div>
           <p className="eyebrow">Your activity</p>

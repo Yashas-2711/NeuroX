@@ -10,7 +10,7 @@ async function context(problemId: string, actor: Actor) {
   if (!problem) throw new AppError("Problem not found", 404);
   const projects = await Project.find({ problem: problem._id }).select("_id university createdBy");
   let allowed = actor.role === "ADMIN" || problem.submittedBy.toString() === actor.userId;
-  let canWrite = actor.role === "ADMIN";
+  let canWrite = actor.role === "ADMIN" || problem.submittedBy.toString() === actor.userId;
   if (actor.role === "UNIVERSITY") {
     const university = await University.findOne({ user: oid(actor.userId) }).select("_id");
     const own = university && projects.some((project) => project.university.toString() === university._id.toString());

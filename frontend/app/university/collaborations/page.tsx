@@ -15,7 +15,10 @@ function Content() {
     return getUniversityCollaborations().then(setItems).catch(() => setError("Unable to load collaboration requests."));
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const respond = async (id: string, status: "accept" | "reject") => {
     try { await respondToCollaboration(id, status); await load(); }

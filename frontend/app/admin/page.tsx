@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/auth/protected-route";
-import { getAdminProblems } from "@/services/admin.service";
+import { getAdminProblems, type AdminProblemSort } from "@/services/admin.service";
 import type { Problem } from "@/types/problem";
 
 function AdminContent() {
@@ -11,13 +11,18 @@ function AdminContent() {
   const [counts, setCounts] = useState({ total: 0, submitted: 0, validated: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const load = () => { setLoading(true); setError(""); getAdminProblems().then((data) => { setItems(data.problems); setCounts(data.counts); }).catch(() => setError("Unable to load the validation queue.")).finally(() => setLoading(false)); };
-  useEffect(() => { Promise.resolve().then(load); }, []);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [sortBy, setSortBy] = useState<AdminProblemSort>("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const load = useCallback(() => { setLoading(true); setError(""); getAdminProblems(statusFilter || undefined, 1, sortBy, sortOrder).then((data) => { setItems(data.problems); setCounts(data.counts); }).catch(() => setError("Unable to load the validation queue.")).finally(() => setLoading(false)); }, [sortBy, sortOrder, statusFilter]);
+  useEffect(() => { Promise.resolve().then(load); }, [load]);
   return <main className="mx-auto max-w-6xl px-5 py-16">
     <p className="eyebrow">NeuroX / Admin control</p><h1 className="display-md mt-3">Validation portal</h1>
     <p className="body-copy mt-5 max-w-2xl">Review citizen submissions and verify the local AI analysis before problems move forward.</p>
+    <div className="mt-8"><Link href="/admin/analytics" className="button-primary">View platform analytics</Link></div>
     <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Total submitted problems" value={counts.total} /><Metric label="Awaiting validation" value={counts.submitted} /><Metric label="Validated" value={counts.validated} /><Metric label="Rejected" value={counts.rejected} /></div>
-    <section className="mt-14"><div className="flex items-end justify-between gap-4"><div><p className="eyebrow">Review queue</p><h2 className="display-sm mt-2">Problems in queue</h2><p className="mt-2 text-sm text-white/55">Submitted, validated, and rejected problems.</p></div><button className="button-secondary" onClick={load} disabled={loading}>Refresh</button></div>
+    <section className="mt-14"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="eyebrow">Review queue</p><h2 className="display-sm mt-2">Problems in queue</h2><p className="mt-2 text-sm text-white/55">Submitted, validated, and rejected problems.</p></div><div className="flex flex-wrap gap-3"><Link className="button-secondary" href="/admin/revival">Dead problem revival</Link><button className="button-secondary" onClick={load} disabled={loading}>Refresh</button></div></div>
+      <div className="mt-6 flex flex-wrap items-end gap-4 border border-white/10 p-4"><label className="block min-w-48 text-sm text-white/70"><span className="eyebrow">Filter status</span><select className="input mt-2 w-full" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All queue problems</option><option value="SUBMITTED">Submitted</option><option value="VALIDATED">Validated</option><option value="REJECTED">Rejected</option></select></label><label className="block min-w-52 text-sm text-white/70"><span className="eyebrow">Sort problems by</span><select className="input mt-2 w-full" value={sortBy} onChange={(event) => setSortBy(event.target.value as AdminProblemSort)}><option value="createdAt">Submitted date</option><option value="title">Problem title</option><option value="category">Category</option><option value="status">Status</option><option value="aiConfidence">AI confidence</option></select></label><label className="block min-w-40 text-sm text-white/70"><span className="eyebrow">Order</span><select className="input mt-2 w-full" value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "asc" | "desc")}><option value="desc">Descending</option><option value="asc">Ascending</option></select></label><button className="button-primary" onClick={load} disabled={loading}>Apply filters</button></div>
       {loading && <p className="mt-8 text-white/50">Loading review queue…</p>}{error && <p className="mt-8 text-red-200" role="alert">{error} <button className="underline" onClick={load}>Retry</button></p>}
       {!loading && !error && items.length === 0 && <p className="mt-8 border border-dashed border-white/20 p-8 text-white/55">No problems are currently in the review queue.</p>}
       {!loading && !error && items.length > 0 && <div className="mt-8 overflow-x-auto border border-white/10"><table className="w-full min-w-[980px] text-left text-sm"><thead className="border-b border-white/10 text-xs uppercase tracking-[0.16em] text-white/45"><tr><th className="p-4">Problem</th><th className="p-4">Category</th><th className="p-4">Location</th><th className="p-4">AI confidence</th><th className="p-4">Submitted</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead><tbody>{items.map((item) => <tr key={item.id} className="border-b border-white/10 last:border-0"><td className="p-4 font-medium text-white">{item.title}</td><td className="p-4 text-white/65">{item.category}</td><td className="p-4 text-white/65">{item.location.city}, {item.location.state}</td><td className="p-4 text-white/65">{typeof item.aiAnalysis?.confidence === "number" ? `${(item.aiAnalysis.confidence * 100).toFixed(1)}%` : "Pending"}</td><td className="p-4 text-white/65">{new Date(item.createdAt).toLocaleDateString()}</td><td className="p-4"><StatusBadge status={item.status} /></td><td className="p-4"><div className="flex flex-wrap gap-3"><Link className="text-link" href={`/admin/problems/${item.id}`}>Review</Link><Link className="text-link" href={`/admin/problems/${item.id}/progress`}>View progress</Link></div></td></tr>)}</tbody></table></div>}
