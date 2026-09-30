@@ -29,7 +29,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 md:px-8 lg:px-12">
         <Link href="/" className="group flex items-center gap-3" onClick={() => setOpen(false)}>
           <span className="flex h-8 w-8 items-center justify-center border border-foreground text-sm font-bold tracking-[-0.08em]">NX</span>
-          <span className="text-sm font-bold uppercase tracking-[0.22em]">NeuroX</span>
+          <span className="text-sm font-bold uppercase tracking-[0.22em]">NeurX</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">

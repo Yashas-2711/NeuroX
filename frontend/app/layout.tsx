@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/context/auth-context";
 
 export const metadata: Metadata = {
-  title: "NeuroX — Societal Innovation Collaboration Platform",
+  title: "NeurX — Societal Innovation Collaboration Platform",
   description: "A collaboration platform for turning community challenges into shared progress.",
 };
 

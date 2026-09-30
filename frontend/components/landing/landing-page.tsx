@@ -35,7 +35,7 @@ export function LandingPage() {
           <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="relative min-h-80 border border-hairline bg-surface p-6 md:p-8">
             <div className="absolute right-0 top-0 h-full w-1/3 bg-[linear-gradient(135deg,transparent_0%,rgba(28,105,212,0.18)_48%,rgba(226,39,24,0.2)_100%)]" />
             <div className="relative flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between border-b border-hairline pb-4"><span className="eyebrow">NeuroX / 001</span><Lightbulb size={18} className="text-m-blue-dark" /></div>
+              <div className="flex items-center justify-between border-b border-hairline pb-4"><span className="eyebrow">NeurX / 001</span><Lightbulb size={18} className="text-m-blue-dark" /></div>
               <div className="py-12"><p className="text-5xl font-bold tracking-[-0.06em] text-foreground md:text-7xl">N→X</p><p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">From a signal in the community to a shared direction for change.</p></div>
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground"><span className="h-2 w-2 rounded-full bg-success" /> Foundation release / Local development</div>
             </div>
@@ -66,7 +66,7 @@ export function LandingPage() {
         <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-24 md:px-8 lg:grid-cols-[1fr_0.8fr] lg:px-12"><div><p className="eyebrow">The next layer</p><h2 className="display-lg mt-5">INTELLIGENCE WITH PURPOSE.</h2></div><div className="self-end"><p className="body-lead">The NeuroX foundation is designed to support a future where evidence, expertise, and lived experience meet without losing sight of the people behind the problem.</p><Link href="/register" className="text-link mt-8 inline-flex">Join the foundation <ArrowRight size={16} /></Link></div></div>
       </section>
 
-      <footer className="bg-background"><div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-8 lg:px-12"><div><p className="text-sm font-bold uppercase tracking-[0.22em]">NeuroX</p><p className="caption mt-2">Societal Innovation Collaboration Platform</p></div><p className="caption">Foundation release / Local development</p></div></footer>
+      <footer className="bg-background"><div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-8 lg:px-12"><div><p className="text-sm font-bold uppercase tracking-[0.22em]">NeurX</p><p className="caption mt-2">Societal Innovation Collaboration Platform</p></div><p className="caption">Foundation release / Local development</p></div></footer>
     </main>
   );
 }
